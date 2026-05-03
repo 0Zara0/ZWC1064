@@ -1,0 +1,110 @@
+# ============================================
+# 嵌入式 C 项目 Git Ignore 文件
+# 适用于 RT1064 智能车项目
+# ============================================
+
+# ============================================
+# 编译生成的文件
+# ============================================
+# 对象文件
+*.o
+*.obj
+*.elf
+
+# 可执行文件
+*.exe
+*.out
+*.hex
+*.bin
+*.axf
+
+# 库文件
+*.a
+*.lib
+*.so
+*.dll
+
+# 依赖文件
+*.d
+*.dep
+
+# 列表/映射文件
+*.map
+*.lst
+*.lss
+
+# ============================================
+# IDE 和编辑器文件
+# ============================================
+# IAR Embedded Workbench
+*.ewt
+*.ewd
+settings/
+Debug/
+Release/
+Obj/
+List/
+
+# Keil MDK
+*.uvguix.*
+*.uvoptx
+*.uvprojx
+*.scvd
+Objects/
+Listings/
+*.iex
+
+# VS Code
+.vscode/settings.json
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/tasks.json
+
+# CLion / IntelliJ IDEA
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries/
+.idea/shelf/
+.idea/dataSources/
+.idea/httpRequests/
+*.iml
+
+# ============================================
+# 调试和日志文件
+# ============================================
+*.log
+*.dbg
+*.scc
+
+# J-Link 调试文件
+JLinkSettings.ini
+JLinkLog.txt
+
+# ============================================
+# 临时文件
+# ============================================
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# Windows 系统文件
+Thumbs.db
+desktop.ini
+
+# ============================================
+# 项目特定文件（根据实际需要调整）
+# ============================================
+# 如果某些库文件是预编译的且不需要源码管理，可以取消注释下面这行
+# libraries/
+
+# 文档生成文件
+doc/html/
+doc/latex/
+
+# 构建输出目录
+build/
+output/
+dist/

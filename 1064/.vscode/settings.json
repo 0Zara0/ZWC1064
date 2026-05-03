@@ -1,0 +1,26 @@
+{
+    "files.associations": {
+        "zf_driver_spi.h": "c",
+        "zf_common_headfile.h": "c",
+        "zf_driver_gpio.h": "c",
+        "fstream": "c",
+        "istream": "c",
+        "limits": "c",
+        "ostream": "c",
+        "sstream": "c",
+        "streambuf": "c",
+        "tuple": "c",
+        "array": "c",
+        "memory": "c",
+        "utility": "c",
+        "wheel.h": "c",
+        "set_map.h": "c",
+        "deque": "c",
+        "string": "c",
+        "unordered_map": "c",
+        "vector": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "zf_common_interrupt.h": "c"
+    }
+}
