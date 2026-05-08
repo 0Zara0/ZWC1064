@@ -191,6 +191,7 @@ void VelocityPID_Init(uint8 pid_index, float Kp, float Ki, float Kd)
     g_velocity_pid_controller[pid_index].error = 0.0f;
     g_velocity_pid_controller[pid_index].error_last = 0.0f;
     g_velocity_pid_controller[pid_index].error_sum = 0.0f;
+    g_velocity_pid_controller[pid_index].error_derivative_filtered = 0.0f;
     g_velocity_pid_controller[pid_index].output = 0.0f;
     
     // 目标与实际值清零
@@ -258,9 +259,12 @@ float VelocityPID_Calculate(uint8 pid_index, float target_speed, float current_s
     }
     float integral = g_velocity_pid_controller[pid_index].Ki * g_velocity_pid_controller[pid_index].error_sum;
     
-    // 4. 微分项 D = Kd * (e - e_last) / dt
-    float derivative = g_velocity_pid_controller[pid_index].Kd * 
-                       (g_velocity_pid_controller[pid_index].error - g_velocity_pid_controller[pid_index].error_last) / dt;
+    // 4. 微分项 D = Kd * (e - e_last) / dt（带低通滤波，抑制编码器噪声尖峰）
+    float derivative_raw = (g_velocity_pid_controller[pid_index].error - g_velocity_pid_controller[pid_index].error_last) / dt;
+    g_velocity_pid_controller[pid_index].error_derivative_filtered = 
+        VELOCITY_PID_D_FILTER_ALPHA * derivative_raw + 
+        (1.0f - VELOCITY_PID_D_FILTER_ALPHA) * g_velocity_pid_controller[pid_index].error_derivative_filtered;
+    float derivative = g_velocity_pid_controller[pid_index].Kd * g_velocity_pid_controller[pid_index].error_derivative_filtered;
     
     // 5. 计算总输出 output = P + I + D
     g_velocity_pid_controller[pid_index].output = proportional + integral + derivative;
@@ -329,6 +333,7 @@ void VelocityPID_Reset(uint8 pid_index)
     g_velocity_pid_controller[pid_index].error = 0.0f;
     g_velocity_pid_controller[pid_index].error_last = 0.0f;
     g_velocity_pid_controller[pid_index].error_sum = 0.0f;
+    g_velocity_pid_controller[pid_index].error_derivative_filtered = 0.0f;
     g_velocity_pid_controller[pid_index].output = 0.0f;
     g_velocity_pid_controller[pid_index].current_speed = 0.0f;
 }
@@ -358,13 +363,13 @@ void VelocityPID_ExecuteMotorControl(uint8 pid_index, DCMotor *motor)
     if (pid_output > 100.0f) pid_output = 100.0f;
     if (pid_output < -100.0f) pid_output = -100.0f;
 
-    if (pid_output > 0.0f && pid_output < 1.0f)
+    if (pid_output > 0.0f && pid_output < 3.0f)
     {
-        pid_output = 1.0f;
+        pid_output = 3.0f;
     }
-    else if (pid_output < 0.0f && pid_output > -1.0f)
+    else if (pid_output < 0.0f && pid_output > -3.0f)
     {
-        pid_output = -1.0f;
+        pid_output = -3.0f;
     }
 
     DCMotor_SetSpeed(motor, pid_output);

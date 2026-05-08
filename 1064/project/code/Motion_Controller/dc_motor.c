@@ -20,7 +20,8 @@ void DCMotor_Init(DCMotor *motor, gpio_pin_enum dir_pin, pwm_channel_enum pwm_ch
     motor->dir_pin = dir_pin;
     motor->pwm_channel = pwm_channel;
     motor->pwm_freq = freq;
-    motor->speed_percent = 0;  // 初始化速度百分比为 0，表示电机初始状态为停止
+    motor->speed_percent = 0;   // 初始化速度百分比为 0，表示电机初始状态为停止
+    motor->dir_inverted = 0;    // 默认不反转方向
     
     // 配置方向控制引脚为 GPIO 输出模式，初始电平为 0
     gpio_init(dir_pin, GPO, 0, GPO_PUSH_PULL);
@@ -43,6 +44,12 @@ void DCMotor_SetSpeed(DCMotor *motor, float speed)
         return;
     }
 
+    // 若电机物理安装方向相反，在软件层取反速度方向，实现通用的方向修正
+    if (motor->dir_inverted)
+    {
+        speed = -speed;
+    }
+
     if (speed > 100.0f)
     {
         speed = 100.0f;
@@ -56,12 +63,12 @@ void DCMotor_SetSpeed(DCMotor *motor, float speed)
 
     if (speed > 0.0f)
     {
-        gpio_set_level(motor->dir_pin, 1);
+        gpio_set_level(motor->dir_pin, 0);
         pwm_set_duty(motor->pwm_channel, (uint32)(speed * 100.0f));
     }
     else if (speed < 0.0f)
     {
-        gpio_set_level(motor->dir_pin, 0);
+        gpio_set_level(motor->dir_pin, 1);
         pwm_set_duty(motor->pwm_channel, (uint32)(-speed * 100.0f));
     }
     else

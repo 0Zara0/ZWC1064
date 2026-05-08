@@ -15,7 +15,8 @@
 
 /** @brief 编码器低通滤波系数 (alpha = dt / (RC + dt)) */
 /** @note alpha 越小滤波效果越强，但响应越慢；alpha 越大响应越快，但滤波效果弱 */
-#define ENCODER_FILTER_ALPHA          (0.2f)
+/** @note 2ms周期: α=0.04 → τ≈50ms（滤波强度高于原5ms/α=0.2，有效抑制编码器单脉冲噪声） */
+#define ENCODER_FILTER_ALPHA          (0.04f)
 
 /** @brief 编码器脉冲数溢出阈值 (用于处理 16 位计数器溢出) */
 #define ENCODER_COUNT_OVERFLOW_THRESHOLD  (32000)
@@ -27,19 +28,32 @@
 
 /** @brief 速度环 PID 比例系数 (Kp) */
 /** @note 增大 Kp 可以加快响应速度，但过大会导致系统震荡 */
-#define VELOCITY_PID_KP               (1.0f)
+/** @note 修正依据：原 Kp=0.05 时满误差 100 仅产生 5% PWM，远低于克服静摩擦所需的 31%+ */
+/** @note Kp=0.35 时满误差 100 产生 35% PWM，足以克服静摩擦启动电机 */
+#define VELOCITY_PID_KP               (0.35f)
 
 /** @brief 速度环 PID 积分系数 (Ki) */
 /** @note 增大 Ki 可以减小稳态误差，但过大会导致超调和震荡 */
-#define VELOCITY_PID_KI               (0.01f)
+/** @note 修正依据：原 Ki=0.001 积分累积过慢，堵转时 500ms 内仅累积约 0.025% 修正，完全无效 */
+/** @note Ki=0.005 在 500ms 内可累积约 12.5% 修正，能有效补偿静摩擦 */
+#define VELOCITY_PID_KI               (0.005f)
 
 /** @brief 速度环 PID 微分系数 (Kd) */
 /** @note 增大 Kd 可以抑制震荡和超调，但过大会放大噪声 */
-#define VELOCITY_PID_KD               (0.05f)
+/** @note 修正依据：原 Kd=0.002 与 dt=2ms 组合导致 Kd/dt=1.0，D项直接等于裸Δerror，引发剧烈振荡 */
+/** @note Kd=0.0002 使 Kd/dt=0.1，进一步衰减编码器跳变影响，抑制高频抖动 */
+#define VELOCITY_PID_KD               (0.0002f)
+
+/** @brief D 项低通滤波系数 (alpha) */
+/** @note 对微分项 (Δerror/dt) 施加一阶低通滤波，抑制编码器噪声引起的 D 项尖峰 */
+/** @note alpha=0.1 在 2ms 周期下对应时间常数约 20ms，平衡滤波效果和响应速度 */
+#define VELOCITY_PID_D_FILTER_ALPHA   (0.1f)
 
 /** @brief 积分分离阈值 */
 /** @note 当误差超过此阈值时，取消积分作用，防止积分饱和 */
-#define VELOCITY_PID_INTEGRAL_LIMIT   (100.0f)
+/** @note 修正依据：原阈值 100 恰好等于目标速度，堵转时 error=100 导致积分被永久锁死 */
+/** @note 增大到 200 确保堵转时 (error=100) 积分仍能持续累积以克服静摩擦 */
+#define VELOCITY_PID_INTEGRAL_LIMIT   (200.0f)
 
 /** @brief 积分项限幅值 */
 /** @note 防止积分累积过大导致积分饱和 */
@@ -78,6 +92,7 @@ typedef struct
     float error;                // 当前误差
     float error_last;           // 上次误差
     float error_sum;            // 误差累积 (积分项)
+    float error_derivative_filtered; // D 项低通滤波后的误差变化率 (Δerror/dt)
     
     // PID 输出
     float output;               // PID 控制器输出 (-100~100 表示 PWM 占空比百分比)

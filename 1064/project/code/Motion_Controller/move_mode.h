@@ -24,13 +24,6 @@ typedef enum
 void MoveMode_Init(void);
 
 /**
- * @brief 初始化运动控制系统（开环模式）
- * @note 适用于编码器未连接或故障的情况，电机将以开环方式运行
- *       不依赖编码器反馈，直接根据目标速度控制电机
- */
-void MoveMode_InitOpenLoop(void);
-
-/**
  * @brief 设置小车运动模式和速度
  * @param mode 运动模式（前进/后退/左移/右移/停止）
  * @param speed 目标速度，单位：脉冲/秒

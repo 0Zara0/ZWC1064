@@ -53,35 +53,6 @@ void MoveMode_Init(void)
 }
 
 /**
- * @brief 初始化运动控制系统（开环模式）
- * @note 适用于编码器未连接或故障的情况，电机将以开环方式运行
- *       具有防重复初始化机制，多次调用只执行一次
- */
-void MoveMode_InitOpenLoop(void)
-{
-    // 防止重复初始化：如果系统已经初始化过，直接返回
-    if (g_system_initialized)
-    {
-        return;
-    }
-    
-    // 初始化传感器系统（编码器 + IMU）
-    MotionPID_Sensor_Init();
-    
-    // 初始化电机控制器
-    MotionPID_Motor_Init();
-    
-    // 切换到开环控制模式
-    MotionPID_SetOpenLoopMode(1);
-    
-    // 初始化定时器（启动自动控制循环）
-    MotionPID_Timer_Init();
-    
-    // 短暂延时确保系统稳定
-    system_delay_ms(50);
-}
-
-/**
  * @brief 设置小车运动模式和速度
  * @param mode 运动模式
  * @param speed 目标速度

@@ -178,13 +178,15 @@ void MotionPID_Motor_Init(void)
     
     // 配置电机 1 的方向引脚和 PWM 通道，设置 PWM 频率
     DCMotor_Init(&g_motor_controller.motor[0], MOTOR1_DIR_PIN, MOTOR1_PWM_CH, MOTOR_PWM_FREQ);
-    
+    g_motor_controller.motor[0].dir_inverted = 1;  // 电机 1 物理安装方向相反
+
     // 初始化电机 2
     DCMotor_Init(&g_motor_controller.motor[1], MOTOR2_DIR_PIN, MOTOR2_PWM_CH, MOTOR_PWM_FREQ);
-    
+
     // 初始化电机 3
     DCMotor_Init(&g_motor_controller.motor[2], MOTOR3_DIR_PIN, MOTOR3_PWM_CH, MOTOR_PWM_FREQ);
-    
+    g_motor_controller.motor[2].dir_inverted = 1;  // 电机 3 物理安装方向相反
+
     // 初始化电机 4
     DCMotor_Init(&g_motor_controller.motor[3], MOTOR4_DIR_PIN, MOTOR4_PWM_CH, MOTOR_PWM_FREQ);
     
@@ -192,16 +194,10 @@ void MotionPID_Motor_Init(void)
     for (uint8 i = 0; i < ENCODER_COUNT; i++)
     {
         g_motor_controller.target_speed[i] = 0.0f;
-        g_motor_controller.requested_speed[i] = 0.0f;
-        g_motor_controller.ramp_start_speed[i] = 0.0f;
-        g_motor_controller.ramp_cycle_count[i] = 0;
     }
     
     // 设置初始化标志
     g_motor_controller.initialized = 1;
-    
-    // 默认启用闭环模式，但允许切换到开环
-    g_motor_controller.open_loop_mode = 0;
     
     // 添加延时确保 PWM 完全启动稳定
     system_delay_ms(10);
@@ -214,7 +210,7 @@ void MotionPID_Motor_Init(void)
  */
 void MotionPID_Timer_Init(void)
 {
-    // 初始化 PIT 通道 1，配置定时时间为 SENSOR_UPDATE_PERIOD_MS 毫秒（默认 5ms）
+    // 初始化 PIT 通道 1，配置定时时间为 SENSOR_UPDATE_PERIOD_MS 毫秒（当前 2ms）
     pit_ms_init(SENSOR_TIMER_CH, SENSOR_UPDATE_PERIOD_MS);
     
     // 启动 PIT 定时器开始计时
@@ -253,75 +249,27 @@ void MotionPID_ResetTimer(void)
 
 /**
  * @brief PIT 定时器中断服务回调函数
- * @note 该函数由 isr.c 中的 PIT_IRQHandler 每 5ms 自动调用一次
+ * @note 该函数由 isr.c 中的 PIT_IRQHandler 每 2ms 自动调用一次
  *       执行传感器数据采集、速度解算、PID 控制和电机驱动等实时任务
+ *       目标速度由外部直接设置，不再经过 S 曲线加速过渡
  */
 void pit_handler(void)
 {
-    // 第一步：读取并更新所有传感器数据到全局变量 g_sensor_data
     MotionPID_UpdateSensorData();
 
-    // 第二步：更新 S 曲线加速，实现电机平滑启动/停止
-    // 使用 smoothstep 函数: f(x) = 3x² - 2x³，在 x=0 和 x=1 处导数均为零
     for (uint8 i = 0; i < ENCODER_COUNT; i++)
     {
-        if (g_motor_controller.ramp_cycle_count[i] > 0)
+        float current_speed = EncoderSpeedCalc_GetFilteredSpeed(i);
+        
+        // 若电机方向被软件反转，编码器反馈也需同步取反，确保 PID 形成负反馈
+        if (g_motor_controller.motor[i].dir_inverted)
         {
-            float progress = (float)g_motor_controller.ramp_cycle_count[i] / MOTION_ACCEL_CYCLES;
-
-            if (progress >= 1.0f)
-            {
-                g_motor_controller.target_speed[i] = g_motor_controller.requested_speed[i];
-                g_motor_controller.ramp_cycle_count[i] = 0;
-            }
-            else
-            {
-                float s_curve = (3.0f - 2.0f * progress) * progress * progress;
-                float speed_diff = g_motor_controller.requested_speed[i] - g_motor_controller.ramp_start_speed[i];
-                g_motor_controller.target_speed[i] = g_motor_controller.ramp_start_speed[i] + speed_diff * s_curve;
-                g_motor_controller.ramp_cycle_count[i]++;
-            }
+            current_speed = -current_speed;
         }
-    }
-
-    // 第三步：根据控制模式执行不同的控制策略
-    if (g_motor_controller.open_loop_mode)
-    {
-        // 开环模式：直接将目标速度转换为PWM输出，不使用PID
-        for (uint8 i = 0; i < ENCODER_COUNT; i++)
-        {
-            float target_speed = g_motor_controller.target_speed[i];
-            
-            // 将目标速度（脉冲/秒）线性映射到PWM占空比（-100~100）
-            // 假设最大速度对应100%占空比，可根据实际情况调整比例系数
-            // 示例：10脉冲/秒 = 1%占空比，即 1000脉冲/秒 = 100%占空比
-            float pwm_duty = target_speed / 10.0f;
-            
-            // 限制PWM范围在 -100~100
-            if (pwm_duty > 100.0f) pwm_duty = 100.0f;
-            if (pwm_duty < -100.0f) pwm_duty = -100.0f;
-            
-            // 直接设置电机速度（开环控制）
-            DCMotor_SetSpeed(&g_motor_controller.motor[i], pwm_duty);
-        }
-    }
-    else
-    {
-        // 闭环模式：执行速度闭环 PID 控制算法
-        for (uint8 i = 0; i < ENCODER_COUNT; i++)
-        {
-            // 获取经过滤波处理后的当前实际速度值
-            float current_speed = EncoderSpeedCalc_GetFilteredSpeed(i);
-            
-            // 获取目标速度
-            float target_speed = g_motor_controller.target_speed[i];
-            
-            // 调用速度环 PID 计算函数，计算控制量输出
-            float pid_output = VelocityPID_Calculate(i, target_speed, current_speed, SENSOR_UPDATE_PERIOD_MS / 1000.0f);
-            
-            // 根据 PID 运算结果驱动对应电机运转
-            VelocityPID_ExecuteMotorControl(i, &g_motor_controller.motor[i]);
-        }
+        
+        float target_speed = g_motor_controller.target_speed[i];
+        float pid_output = VelocityPID_Calculate(i, target_speed, current_speed, SENSOR_UPDATE_PERIOD_MS / 1000.0f);
+        VelocityPID_ExecuteMotorControl(i, &g_motor_controller.motor[i]);
     }
 }
 
@@ -337,12 +285,7 @@ void MotionPID_SetTargetSpeed(uint8 motor_index, float target_speed)
 {
     if (motor_index < ENCODER_COUNT)
     {
-        if (g_motor_controller.requested_speed[motor_index] != target_speed)
-        {
-            g_motor_controller.ramp_start_speed[motor_index] = g_motor_controller.target_speed[motor_index];
-            g_motor_controller.requested_speed[motor_index] = target_speed;
-            g_motor_controller.ramp_cycle_count[motor_index] = 1;
-        }
+        g_motor_controller.target_speed[motor_index] = target_speed;
     }
 }
 
@@ -374,36 +317,6 @@ float MotionPID_GetActualSpeed(uint8 motor_index)
         return EncoderSpeedCalc_GetFilteredSpeed(motor_index);
     }
     return 0.0f;
-}
-
-/**
- * @brief 设置开环/闭环控制模式
- * @param enable_open_loop 1=启用开环模式，0=启用闭环模式
- * @note 开环模式下电机直接根据目标速度运行，不依赖编码器反馈
- *       适用于编码器故障或未连接的情况
- *       切换时会自动重置PID控制器状态，避免积分饱和
- */
-void MotionPID_SetOpenLoopMode(uint8 enable_open_loop)
-{
-    g_motor_controller.open_loop_mode = enable_open_loop;
-    
-    // 切换到开环模式时，重置所有PID控制器以避免积分饱和
-    if (enable_open_loop)
-    {
-        for (uint8 i = 0; i < ENCODER_COUNT; i++)
-        {
-            VelocityPID_Reset(i);
-        }
-    }
-}
-
-/**
- * @brief 获取当前控制模式
- * @return uint8 1=开环模式，0=闭环模式
- */
-uint8 MotionPID_GetOpenLoopMode(void)
-{
-    return g_motor_controller.open_loop_mode;
 }
 
 

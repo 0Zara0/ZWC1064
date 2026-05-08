@@ -13,10 +13,7 @@
 
 // 定时器配置
 #define SENSOR_TIMER_CH         PIT_CH0               // 使用 PIT 通道 0
-#define SENSOR_UPDATE_PERIOD_MS 5                     // 传感器更新周期 5ms(200Hz)
-
-// S 曲线加速配置
-#define MOTION_ACCEL_CYCLES     (100)                 // S 曲线加速周期数 (100 × 5ms = 500ms 加速时间)
+#define SENSOR_UPDATE_PERIOD_MS 2                     // 传感器更新周期 2ms(500Hz)
 
 /**
  * @brief 传感器数据结构体定义
@@ -29,7 +26,7 @@
  * // ========== 系统初始化阶段 ==========
  * MotionPID_Sensor_Init();   // 初始化传感器硬件（编码器 + IMU）
  * MotionPID_Motor_Init();     // 初始化电机驱动控制器
- * MotionPID_Timer_Init();     // 初始化 PIT 定时器（自动使能中断，5ms 周期）
+ * MotionPID_Timer_Init();     // 初始化 PIT 定时器（自动使能中断，2ms 周期）
  * 
  * // ========== 主循环运行阶段 ==========
  * // 使用中断方式时的主循环（推荐方案）
@@ -64,12 +61,8 @@ typedef struct
 typedef struct
 {
     DCMotor motor[ENCODER_COUNT];           // 4 个直流电机实例
-    float target_speed[ENCODER_COUNT];      // 当前加速曲线输出速度（脉冲/秒），供 PID/开环使用
-    float requested_speed[ENCODER_COUNT];   // 最终期望目标速度（脉冲/秒）
-    float ramp_start_speed[ENCODER_COUNT];  // S 曲线加速起始速度（脉冲/秒）
-    uint16 ramp_cycle_count[ENCODER_COUNT]; // S 曲线加速周期计数器（0=加速完成）
+    float target_speed[ENCODER_COUNT];      // 目标速度（脉冲/秒），供 PID 直接使用
     uint8 initialized;                      // 初始化标志
-    uint8 open_loop_mode;                   // 开环模式标志（1=开环，0=闭环）
 } MotorController_t;
 
 // 全局变量外部声明，供其他文件访问
@@ -90,9 +83,5 @@ void MotionPID_ResetTimer(void);                        // 重置定时器
 void MotionPID_SetTargetSpeed(uint8 motor_index, float target_speed);  // 设置单个电机目标速度（脉冲/秒）
 void MotionPID_SetAllMotorsSpeed(float target_speed);                  // 设置所有电机相同的目标速度
 float MotionPID_GetActualSpeed(uint8 motor_index);                     // 获取单个电机的实际速度
-
-// 开环/闭环控制模式切换
-void MotionPID_SetOpenLoopMode(uint8 enable_open_loop);                // 设置开环/闭环模式
-uint8 MotionPID_GetOpenLoopMode(void);                                 // 获取当前控制模式
 
 #endif //MOTION_PID_H
