@@ -1,0 +1,478 @@
+[
+  {
+    "type": "read",
+    "data": "/* Copy these four lines to imu963.h */\r\n#define IMU963_MAG_X_OFFSET_UT               (745.2141f)\r\n#define IMU963_MAG_Y_OFFSET_UT               (7936528.5076f)\r\n#define IMU963_MAG_X_SCALE                   (395.3809f)\r\n#define IMU963_MAG_Y_SCALE                   (0.5006f)\r\n",
+    "timestamp": 1778711285041,
+    "time": "2026-05-14 06:28:05:041",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "    IMU + Encoder initialized\r\n    Encoders cleared\r\n[2] Initializing motors...\r\n",
+    "timestamp": 1778711286122,
+    "time": "2026-05-14 06:28:06:122",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "    4 motors initialized\r\n[3] Initializing PIT timer (PID loop)...\r\n[4] Enabling interrupts...\r\n    PID loop active (2ms)\r\n",
+    "timestamp": 1778711286144,
+    "time": "2026-05-14 06:28:06:144",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n========================================\r\n   === Stage 6: Distance Control ===\r\n========================================\r\n   Cycle: Forward 1-cell -> StrafeLeft 1-cell ->\r\n          Backward 1-cell -> StrafeRight 1-cell\r\n   4 cycles total (draws a small square)\r\n========================================\r\n\r\n--- Cycle 1: Forward 1 cell ---\r\n",
+    "timestamp": 1778711286474,
+    "time": "2026-05-14 06:28:06:474",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Fwd T=0.1s ENC_avg=8047 RF=-1574 LF=+5079 RR=-1854 LR=+23680\r\n",
+    "timestamp": 1778711286580,
+    "time": "2026-05-14 06:28:06:580",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Fwd T=0.2s ENC_avg=9168 RF=-2414 LF=+4784 RR=-2261 LR=+27213\r\n",
+    "timestamp": 1778711286684,
+    "time": "2026-05-14 06:28:06:684",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Fwd T=0.3s ENC_avg=9230 RF=-2886 LF=+4852 RR=-3713 LR=+25471\r\n",
+    "timestamp": 1778711286792,
+    "time": "2026-05-14 06:28:06:792",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Fwd T=0.4s ENC_avg=10304 RF=-7032 LF=+4778 RR=-1176 LR=+28228\r\n--- Forward done ---\r\n",
+    "timestamp": 1778711286899,
+    "time": "2026-05-14 06:28:06:899",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 1: StrafeLeft 1 cell ---\r\n",
+    "timestamp": 1778711287404,
+    "time": "2026-05-14 06:28:07:404",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.1s ENC_avg=14499 RF=+3674 LF=-3064 RR=+3015 LR=+48241\r\n",
+    "timestamp": 1778711287508,
+    "time": "2026-05-14 06:28:07:508",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.2s ENC_avg=12520 RF=-6043 LF=-4409 RR=+3133 LR=+36494\r\n",
+    "timestamp": 1778711287616,
+    "time": "2026-05-14 06:28:07:616",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.3s ENC_avg=8910 RF=-4960 LF=-4691 RR=+3451 LR=+22538\r\n",
+    "timestamp": 1778711287721,
+    "time": "2026-05-14 06:28:07:721",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.4s ENC_avg=11494 RF=-8909 LF=-4672 RR=+2945 LR=+29453\r\n",
+    "timestamp": 1778711287827,
+    "time": "2026-05-14 06:28:07:827",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.5s ENC_avg=8975 RF=+2104 LF=-4974 RR=+4000 LR=+24821\r\n",
+    "timestamp": 1778711287934,
+    "time": "2026-05-14 06:28:07:934",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.6s ENC_avg=11743 RF=+2166 LF=-3456 RR=+4068 LR=+37282\r\n",
+    "timestamp": 1778711288041,
+    "time": "2026-05-14 06:28:08:041",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.7s ENC_avg=11320 RF=-2103 LF=-619 RR=-19 LR=+42538\r\n",
+    "timestamp": 1778711288145,
+    "time": "2026-05-14 06:28:08:145",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.8s ENC_avg=12434 RF=+306 LF=-1263 RR=+286 LR=+47880\r\n",
+    "timestamp": 1778711288253,
+    "time": "2026-05-14 06:28:08:253",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.9s ENC_avg=13397 RF=-2876 LF=-753 RR=+320 LR=+49640\r\n",
+    "timestamp": 1778711288357,
+    "time": "2026-05-14 06:28:08:357",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=1.0s ENC_avg=13529 RF=-3885 LF=-401 RR=+504 LR=+49327\r\n--- StrafeLeft done ---\r\n",
+    "timestamp": 1778711288466,
+    "time": "2026-05-14 06:28:08:466",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 2: Forward 1 cell ---\r\n",
+    "timestamp": 1778711288969,
+    "time": "2026-05-14 06:28:08:969",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Fwd T=0.1s ENC_avg=4723 RF=+4035 LF=+1286 RR=-4750 LR=-8823\r\n",
+    "timestamp": 1778711289075,
+    "time": "2026-05-14 06:28:09:075",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Fwd T=0.2s ENC_avg=15028 RF=-3335 LF=+4756 RR=-3710 LR=-48309\r\n",
+    "timestamp": 1778711289183,
+    "time": "2026-05-14 06:28:09:183",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Fwd T=0.3s ENC_avg=14202 RF=-3794 LF=+4711 RR=-4618 LR=-43684\r\n--- Forward done ---\r\n",
+    "timestamp": 1778711289288,
+    "time": "2026-05-14 06:28:09:288",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 2: StrafeLeft 1 cell ---\r\n",
+    "timestamp": 1778711289794,
+    "time": "2026-05-14 06:28:09:794",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.1s ENC_avg=19163 RF=-21 LF=-2295 RR=+5059 LR=-69278\r\n",
+    "timestamp": 1778711289900,
+    "time": "2026-05-14 06:28:09:900",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.2s ENC_avg=16120 RF=-3569 LF=-5245 RR=+2511 LR=-53157\r\n",
+    "timestamp": 1778711290007,
+    "time": "2026-05-14 06:28:10:007",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.3s ENC_avg=13215 RF=-4748 LF=-5571 RR=+4175 LR=-38365\r\n",
+    "timestamp": 1778711290112,
+    "time": "2026-05-14 06:28:10:112",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.4s ENC_avg=14925 RF=-1845 LF=-5624 RR=+4207 LR=-48026\r\n",
+    "timestamp": 1778711290217,
+    "time": "2026-05-14 06:28:10:217",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.5s ENC_avg=13125 RF=-3466 LF=-5915 RR=+4642 LR=-38477\r\n",
+    "timestamp": 1778711290325,
+    "time": "2026-05-14 06:28:10:325",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.6s ENC_avg=10935 RF=-378 LF=-4796 RR=+1791 LR=-36777\r\n",
+    "timestamp": 1778711290430,
+    "time": "2026-05-14 06:28:10:430",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.7s ENC_avg=10536 RF=-759 LF=-4764 RR=+567 LR=-36054\r\n",
+    "timestamp": 1778711290536,
+    "time": "2026-05-14 06:28:10:536",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.8s ENC_avg=9523 RF=-561 LF=-2588 RR=+205 LR=-34739\r\n",
+    "timestamp": 1778711290640,
+    "time": "2026-05-14 06:28:10:640",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.9s ENC_avg=7531 RF=-726 LF=-144 RR=+186 LR=-29068\r\n",
+    "timestamp": 1778711290749,
+    "time": "2026-05-14 06:28:10:749",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.0s ENC_avg=11343 RF=-105 LF=+5937 RR=+480 LR=-38849\r\n",
+    "timestamp": 1778711290854,
+    "time": "2026-05-14 06:28:10:854",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.1s ENC_avg=8860 RF=-331 LF=-240 RR=+37 LR=-34831\r\n",
+    "timestamp": 1778711290958,
+    "time": "2026-05-14 06:28:10:958",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.2s ENC_avg=9121 RF=-665 LF=-2514 RR=+40 LR=-33267\r\n",
+    "timestamp": 1778711291064,
+    "time": "2026-05-14 06:28:11:064",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.3s ENC_avg=8240 RF=-423 LF=-2537 RR=+142 LR=-29857\r\n",
+    "timestamp": 1778711291172,
+    "time": "2026-05-14 06:28:11:172",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.4s ENC_avg=9517 RF=-1648 LF=-1001 RR=+1241 LR=-34178\r\n--- StrafeLeft done ---\r\n",
+    "timestamp": 1778711291280,
+    "time": "2026-05-14 06:28:11:280",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 3: Forward 1 cell ---\r\n",
+    "timestamp": 1778711291785,
+    "time": "2026-05-14 06:28:11:785",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Fwd T=0.1s ENC_avg=1368 RF=-0 LF=+0 RR=-4711 LR=-761\r\n",
+    "timestamp": 1778711291887,
+    "time": "2026-05-14 06:28:11:887",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Fwd T=0.2s ENC_avg=12367 RF=-3720 LF=+3759 RR=-4424 LR=+37566\r\n",
+    "timestamp": 1778711291996,
+    "time": "2026-05-14 06:28:11:996",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Fwd T=0.3s ENC_avg=10872 RF=-2800 LF=+2165 RR=-3638 LR=+34885\r\n",
+    "timestamp": 1778711292103,
+    "time": "2026-05-14 06:28:12:103",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Fwd T=0.4s ENC_avg=12250 RF=-322 LF=+2803 RR=-4339 LR=+41535\r\n--- Forward done ---\r\n",
+    "timestamp": 1778711292211,
+    "time": "2026-05-14 06:28:12:211",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 3: StrafeLeft 1 cell ---\r\n",
+    "timestamp": 1778711292712,
+    "time": "2026-05-14 06:28:12:712",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.1s ENC_avg=17783 RF=-0 LF=-1178 RR=+3108 LR=+66844\r\n",
+    "timestamp": 1778711292820,
+    "time": "2026-05-14 06:28:12:820",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.2s ENC_avg=15778 RF=-96 LF=-2682 RR=+4306 LR=+56026\r\n",
+    "timestamp": 1778711292923,
+    "time": "2026-05-14 06:28:12:923",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.3s ENC_avg=13420 RF=-1876 LF=-5402 RR=+5139 LR=+41261\r\n",
+    "timestamp": 1778711293032,
+    "time": "2026-05-14 06:28:13:032",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.4s ENC_avg=13772 RF=-6022 LF=-4150 RR=+4348 LR=+40570\r\n",
+    "timestamp": 1778711293138,
+    "time": "2026-05-14 06:28:13:138",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.5s ENC_avg=11486 RF=-1173 LF=-1524 RR=+4424 LR=+38824\r\n",
+    "timestamp": 1778711293245,
+    "time": "2026-05-14 06:28:13:245",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.6s ENC_avg=5482 RF=-147 LF=-79 RR=+4910 LR=+16793\r\n",
+    "timestamp": 1778711293347,
+    "time": "2026-05-14 06:28:13:347",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.7s ENC_avg=6536 RF=-1693 LF=-1065 RR=+760 LR=-22628\r\n",
+    "timestamp": 1778711293457,
+    "time": "2026-05-14 06:28:13:457",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.8s ENC_avg=7065 RF=-1799 LF=-558 RR=+788 LR=-25116\r\n",
+    "timestamp": 1778711293564,
+    "time": "2026-05-14 06:28:13:564",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.9s ENC_avg=11219 RF=+528 LF=-570 RR=+628 LR=-43147\r\n",
+    "timestamp": 1778711293664,
+    "time": "2026-05-14 06:28:13:664",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.0s ENC_avg=10830 RF=-1994 LF=-869 RR=+808 LR=-39650\r\n",
+    "timestamp": 1778711293771,
+    "time": "2026-05-14 06:28:13:771",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.1s ENC_avg=9444 RF=-101 LF=-850 RR=+764 LR=-36062\r\n",
+    "timestamp": 1778711293877,
+    "time": "2026-05-14 06:28:13:877",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.2s ENC_avg=8882 RF=+386 LF=-869 RR=+1015 LR=-33257\r\n",
+    "timestamp": 1778711293989,
+    "time": "2026-05-14 06:28:13:989",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.3s ENC_avg=9502 RF=-2150 LF=-965 RR=+667 LR=-34224\r\n--- StrafeLeft done ---\r\n",
+    "timestamp": 1778711294095,
+    "time": "2026-05-14 06:28:14:095",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 4: Forward 1 cell ---\r\n",
+    "timestamp": 1778711294596,
+    "time": "2026-05-14 06:28:14:596",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Fwd T=0.1s ENC_avg=17728 RF=+138 LF=+7 RR=-3797 LR=-66971\r\n",
+    "timestamp": 1778711294704,
+    "time": "2026-05-14 06:28:14:704",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Fwd T=0.2s ENC_avg=15957 RF=+22 LF=+3389 RR=-4676 LR=-55741\r\n--- Forward done ---\r\n",
+    "timestamp": 1778711294812,
+    "time": "2026-05-14 06:28:14:812",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 4: StrafeLeft 1 cell ---\r\n",
+    "timestamp": 1778711295317,
+    "time": "2026-05-14 06:28:15:317",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.1s ENC_avg=17638 RF=+9 LF=+1 RR=+4411 LR=-66132\r\n",
+    "timestamp": 1778711295418,
+    "time": "2026-05-14 06:28:15:418",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.2s ENC_avg=14681 RF=-5 LF=-3190 RR=+3638 LR=-51891\r\n",
+    "timestamp": 1778711295529,
+    "time": "2026-05-14 06:28:15:529",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.3s ENC_avg=11782 RF=-1589 LF=-3319 RR=+4916 LR=-37304\r\n",
+    "timestamp": 1778711295628,
+    "time": "2026-05-14 06:28:15:628",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.4s ENC_avg=13322 RF=-2377 LF=-5578 RR=+4571 LR=-40760\r\n",
+    "timestamp": 1778711295736,
+    "time": "2026-05-14 06:28:15:736",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.5s ENC_avg=13269 RF=-4419 LF=-5683 RR=+4741 LR=-38234\r\n",
+    "timestamp": 1778711295846,
+    "time": "2026-05-14 06:28:15:846",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.6s ENC_avg=8606 RF=-4476 LF=-4161 RR=+4286 LR=-21502\r\n--- StrafeLeft done ---\r\n",
+    "timestamp": 1778711295956,
+    "time": "2026-05-14 06:28:15:956",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n=== Stage 6 Complete ===\r\n",
+    "timestamp": 1778711296453,
+    "time": "2026-05-14 06:28:16:453",
+    "display": "ascii"
+  }
+]

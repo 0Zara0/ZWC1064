@@ -12,7 +12,7 @@
 //  MAIN_DEBUG=0   → 完整工作模式 (推箱子求解 + 路径执行)
 // ============================================================================
 #define MAIN_DEBUG           1
-#define DEBUG_STAGE          4
+#define DEBUG_STAGE          6
 
 // ============================================================================
 //  推箱子地图参数（仅在正常模式下生效）
@@ -450,8 +450,6 @@ int main(void)
         for (int cycle = 0; cycle < 4; cycle++)
         {
             printf("\r\n--- Cycle %d: Forward 1 cell ---\r\n", cycle + 1);
-            printf("  Time     ENC_avg  Speed_RF  Speed_LF  Speed_RR  Speed_LR\r\n");
-            printf("  ----     -------  --------  --------  --------  --------\r\n");
 
             MoveMode_ForwardDistance(1, MOVE_DEFAULT_SPEED);
             uint32 t = 0;
@@ -466,19 +464,17 @@ int main(void)
                 raw = EncoderSpeedCalc_GetFilteredSpeed(2); float s2 = raw < 0 ? -raw : raw;
                 raw = EncoderSpeedCalc_GetFilteredSpeed(3); float s3 = raw < 0 ? -raw : raw;
                 float avg_enc = (s0 + s1 + s2 + s3) / 4.0f;
-                printf("  %4.1fs    %5.0f    %+6.0f     %+6.0f     %+6.0f     %+6.0f\r\n",
-                       t * 0.1f, avg_enc,
+                printf("C=%d Dir=Fwd T=%.1fs ENC_avg=%.0f RF=%+.0f LF=%+.0f RR=%+.0f LR=%+.0f\r\n",
+                       cycle + 1, t * 0.1f, avg_enc,
                        EncoderSpeedCalc_GetFilteredSpeed(0),
                        EncoderSpeedCalc_GetFilteredSpeed(1),
                        EncoderSpeedCalc_GetFilteredSpeed(2),
                        EncoderSpeedCalc_GetFilteredSpeed(3));
             }
-            printf("  --- Forward done ---\r\n");
+            printf("--- Forward done ---\r\n");
             system_delay_ms(500);
 
             printf("\r\n--- Cycle %d: StrafeLeft 1 cell ---\r\n", cycle + 1);
-            printf("  Time     ENC_avg  Speed_RF  Speed_LF  Speed_RR  Speed_LR\r\n");
-            printf("  ----     -------  --------  --------  --------  --------\r\n");
 
             MoveMode_StrafeLeftDistance(1, MOVE_DEFAULT_SPEED);
             t = 0;
@@ -487,19 +483,20 @@ int main(void)
                 system_delay_ms(100);
                 MoveMode_DistanceUpdate();
                 t++;
-                raw = EncoderSpeedCalc_GetFilteredSpeed(0); s0 = raw < 0 ? -raw : raw;
-                raw = EncoderSpeedCalc_GetFilteredSpeed(1); s1 = raw < 0 ? -raw : raw;
-                raw = EncoderSpeedCalc_GetFilteredSpeed(2); s2 = raw < 0 ? -raw : raw;
-                raw = EncoderSpeedCalc_GetFilteredSpeed(3); s3 = raw < 0 ? -raw : raw;
-                avg_enc = (s0 + s1 + s2 + s3) / 4.0f;
-                printf("  %4.1fs    %5.0f    %+6.0f     %+6.0f     %+6.0f     %+6.0f\r\n",
-                       t * 0.1f, avg_enc,
+                float raw;
+                raw = EncoderSpeedCalc_GetFilteredSpeed(0); float s0 = raw < 0 ? -raw : raw;
+                raw = EncoderSpeedCalc_GetFilteredSpeed(1); float s1 = raw < 0 ? -raw : raw;
+                raw = EncoderSpeedCalc_GetFilteredSpeed(2); float s2 = raw < 0 ? -raw : raw;
+                raw = EncoderSpeedCalc_GetFilteredSpeed(3); float s3 = raw < 0 ? -raw : raw;
+                float avg_enc = (s0 + s1 + s2 + s3) / 4.0f;
+                printf("C=%d Dir=Left T=%.1fs ENC_avg=%.0f RF=%+.0f LF=%+.0f RR=%+.0f LR=%+.0f\r\n",
+                       cycle + 1, t * 0.1f, avg_enc,
                        EncoderSpeedCalc_GetFilteredSpeed(0),
                        EncoderSpeedCalc_GetFilteredSpeed(1),
                        EncoderSpeedCalc_GetFilteredSpeed(2),
                        EncoderSpeedCalc_GetFilteredSpeed(3));
             }
-            printf("  --- StrafeLeft done ---\r\n");
+            printf("--- StrafeLeft done ---\r\n");
             system_delay_ms(500);
         }
 

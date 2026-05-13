@@ -19,11 +19,11 @@
 /** @brief 距离移动完成判定阈值（脉冲误差容限） */
 #define MOVE_POSITION_TOLERANCE         (20)
 
-/** @brief 减速触发阈值：剩余脉冲数低于此值时降速避免惯性过冲 */
-#define MOVE_DECEL_THRESHOLD            (500)
+/** @brief 位置 P 控制增益：dynamic_speed = Kp * remaining */
+#define MOVE_POSITION_KP                (10.0f)
 
-/** @brief 减速阶段的目标速度（脉冲/秒） */
-#define MOVE_DECEL_SPEED                (1000.0f)
+/** @brief 位置 P 控制输出的最低速度（脉冲/秒），确保能克服摩擦力 */
+#define MOVE_POSITION_MIN_SPEED         (500.0f)
 
 #define MOVE_RUNPATH_DEFAULT_SPEED      (5000.0f)
 #define MOVE_RUNPATH_WAIT_DELAY_MS      (10)

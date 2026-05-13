@@ -1,0 +1,1045 @@
+[
+  {
+    "type": "read",
+    "data": "/* Copy these four lines to imu963.h */\r\n#define IMU963_MAG_X_OFFSET_UT               (734.6291f)\r\n#define IMU963_MAG_Y_OFFSET_UT               (-8721921.9893f)\r\n#define IMU963_MAG_X_SCALE                   (246.7947f)\r\n#define IMU963_MAG_Y_SCALE                   (0.5010f)\r\n",
+    "timestamp": 1778709529519,
+    "time": "2026-05-14 05:58:49:519",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "    IMU + Encoder initialized\r\n    Encoders cleared\r\n[2] Initializing motors...\r\n",
+    "timestamp": 1778709530531,
+    "time": "2026-05-14 05:58:50:531",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "    4 motors initialized\r\n[3] Initializing PIT timer (PID loop)...\r\n[4] Enabling interrupts...\r\n    PID loop active (2ms)\r\n",
+    "timestamp": 1778709530551,
+    "time": "2026-05-14 05:58:50:551",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n========================================\r\n   === Stage 6: Distance Control ===\r\n========================================\r\n   Cycle: Forward 1-cell -> StrafeLeft 1-cell ->\r\n          Backward 1-cell -> StrafeRight 1-cell\r\n   4 cycles total (draws a small square)\r\n========================================\r\n\r\n--- Cycle 1: Forward 1 cell ---\r\n",
+    "timestamp": 1778709530881,
+    "time": "2026-05-14 05:58:50:881",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Fwd T=0.1s ENC_avg=7722 RF=-2263 LF=+4896 RR=-4021 LR=+19707\r\n",
+    "timestamp": 1778709530989,
+    "time": "2026-05-14 05:58:50:989",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Fwd T=0.2s ENC_avg=12963 RF=-6337 LF=+4945 RR=-4695 LR=+35873\r\n",
+    "timestamp": 1778709531094,
+    "time": "2026-05-14 05:58:51:094",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Fwd T=0.3s ENC_avg=15119 RF=-4152 LF=+4755 RR=-4965 LR=+46605\r\n",
+    "timestamp": 1778709531199,
+    "time": "2026-05-14 05:58:51:199",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Fwd T=0.4s ENC_avg=15639 RF=+153 LF=+1305 RR=+4093 LR=+57005\r\n--- Forward done ---\r\n",
+    "timestamp": 1778709531307,
+    "time": "2026-05-14 05:58:51:307",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 1: StrafeLeft 1 cell ---\r\n",
+    "timestamp": 1778709531812,
+    "time": "2026-05-14 05:58:51:812",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.1s ENC_avg=19245 RF=-473 LF=-2508 RR=+3408 LR=+70591\r\n",
+    "timestamp": 1778709531918,
+    "time": "2026-05-14 05:58:51:918",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.2s ENC_avg=18174 RF=-1811 LF=-4480 RR=+8544 LR=+57861\r\n",
+    "timestamp": 1778709532023,
+    "time": "2026-05-14 05:58:52:023",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.3s ENC_avg=12826 RF=-2342 LF=-4642 RR=+2764 LR=+41555\r\n",
+    "timestamp": 1778709532130,
+    "time": "2026-05-14 05:58:52:130",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.4s ENC_avg=13342 RF=-777 LF=-5191 RR=+4611 LR=+42787\r\n",
+    "timestamp": 1778709532236,
+    "time": "2026-05-14 05:58:52:236",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=1 Dir=Left T=0.5s ENC_avg=14609 RF=-8785 LF=-2296 RR=+4553 LR=+42804\r\n--- StrafeLeft done ---\r\n",
+    "timestamp": 1778709532344,
+    "time": "2026-05-14 05:58:52:344",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 2: Forward 1 cell ---\r\n",
+    "timestamp": 1778709532847,
+    "time": "2026-05-14 05:58:52:847",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Fwd T=0.1s ENC_avg=19170 RF=-15 LF=+5077 RR=-560 LR=+71025\r\n",
+    "timestamp": 1778709532956,
+    "time": "2026-05-14 05:58:52:956",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Fwd T=0.2s ENC_avg=16864 RF=-3678 LF=+5294 RR=-3847 LR=+54637\r\n--- Forward done ---\r\n",
+    "timestamp": 1778709533061,
+    "time": "2026-05-14 05:58:53:061",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 2: StrafeLeft 1 cell ---\r\n",
+    "timestamp": 1778709533566,
+    "time": "2026-05-14 05:58:53:566",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.1s ENC_avg=15374 RF=-3161 LF=-3029 RR=+7757 LR=-47550\r\n",
+    "timestamp": 1778709533673,
+    "time": "2026-05-14 05:58:53:673",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.2s ENC_avg=14656 RF=-3908 LF=-4954 RR=+4632 LR=-45129\r\n",
+    "timestamp": 1778709533777,
+    "time": "2026-05-14 05:58:53:777",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.3s ENC_avg=13180 RF=-547 LF=-3989 RR=+3750 LR=-44434\r\n",
+    "timestamp": 1778709533885,
+    "time": "2026-05-14 05:58:53:885",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.4s ENC_avg=10579 RF=-3393 LF=-4475 RR=+4855 LR=-29592\r\n",
+    "timestamp": 1778709533990,
+    "time": "2026-05-14 05:58:53:990",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.5s ENC_avg=6974 RF=-659 LF=-3655 RR=-338 LR=-23244\r\n",
+    "timestamp": 1778709534096,
+    "time": "2026-05-14 05:58:54:096",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.6s ENC_avg=9230 RF=-1186 LF=+2789 RR=-209 LR=-32735\r\n",
+    "timestamp": 1778709534203,
+    "time": "2026-05-14 05:58:54:203",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.7s ENC_avg=9635 RF=-280 LF=-3240 RR=-141 LR=-34880\r\n",
+    "timestamp": 1778709534309,
+    "time": "2026-05-14 05:58:54:309",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.8s ENC_avg=10034 RF=-576 LF=+5790 RR=-142 LR=-33627\r\n",
+    "timestamp": 1778709534414,
+    "time": "2026-05-14 05:58:54:414",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=0.9s ENC_avg=9807 RF=-868 LF=-1354 RR=-195 LR=-36811\r\n",
+    "timestamp": 1778709534520,
+    "time": "2026-05-14 05:58:54:520",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.0s ENC_avg=9023 RF=-334 LF=+680 RR=-74 LR=-35005\r\n",
+    "timestamp": 1778709534625,
+    "time": "2026-05-14 05:58:54:625",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.1s ENC_avg=9302 RF=-326 LF=+1849 RR=-55 LR=-34977\r\n",
+    "timestamp": 1778709534732,
+    "time": "2026-05-14 05:58:54:732",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.2s ENC_avg=8147 RF=-573 LF=-1451 RR=-95 LR=-30469\r\n",
+    "timestamp": 1778709534840,
+    "time": "2026-05-14 05:58:54:840",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.3s ENC_avg=8759 RF=-295 LF=+3316 RR=-97 LR=-31327\r\n",
+    "timestamp": 1778709534944,
+    "time": "2026-05-14 05:58:54:944",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.4s ENC_avg=9503 RF=-844 LF=+2653 RR=-259 LR=-34256\r\n",
+    "timestamp": 1778709535048,
+    "time": "2026-05-14 05:58:55:048",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.5s ENC_avg=8967 RF=-488 LF=+3144 RR=-205 LR=-32032\r\n",
+    "timestamp": 1778709535157,
+    "time": "2026-05-14 05:58:55:157",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.6s ENC_avg=9680 RF=-655 LF=-356 RR=-313 LR=-37398\r\n",
+    "timestamp": 1778709535263,
+    "time": "2026-05-14 05:58:55:263",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.7s ENC_avg=10017 RF=-565 LF=+1045 RR=-85 LR=-38372\r\n",
+    "timestamp": 1778709535365,
+    "time": "2026-05-14 05:58:55:365",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.8s ENC_avg=9644 RF=-763 LF=+3034 RR=-244 LR=-34535\r\n",
+    "timestamp": 1778709535475,
+    "time": "2026-05-14 05:58:55:475",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=1.9s ENC_avg=9072 RF=-507 LF=-3556 RR=-215 LR=-32009\r\n",
+    "timestamp": 1778709535580,
+    "time": "2026-05-14 05:58:55:580",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=2.0s ENC_avg=7791 RF=-421 LF=-322 RR=-171 LR=-30249\r\n",
+    "timestamp": 1778709535686,
+    "time": "2026-05-14 05:58:55:686",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=2.1s ENC_avg=9553 RF=-172 LF=-467 RR=-40 LR=-37535\r\n",
+    "timestamp": 1778709535789,
+    "time": "2026-05-14 05:58:55:789",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=2.2s ENC_avg=8537 RF=-487 LF=-2573 RR=+35 LR=-31053\r\n",
+    "timestamp": 1778709535899,
+    "time": "2026-05-14 05:58:55:899",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=2.3s ENC_avg=8125 RF=-587 LF=+515 RR=-165 LR=-31233\r\n",
+    "timestamp": 1778709536005,
+    "time": "2026-05-14 05:58:56:005",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=2.4s ENC_avg=6476 RF=-894 LF=+1015 RR=-520 LR=-23475\r\n",
+    "timestamp": 1778709536112,
+    "time": "2026-05-14 05:58:56:112",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=2.5s ENC_avg=8542 RF=-1006 LF=+1767 RR=-660 LR=-30734\r\n",
+    "timestamp": 1778709536217,
+    "time": "2026-05-14 05:58:56:217",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=2.6s ENC_avg=9423 RF=-695 LF=+2793 RR=-898 LR=-33306\r\n",
+    "timestamp": 1778709536319,
+    "time": "2026-05-14 05:58:56:319",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=2.7s ENC_avg=9353 RF=-912 LF=-220 RR=-159 LR=-36123\r\n",
+    "timestamp": 1778709536428,
+    "time": "2026-05-14 05:58:56:428",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=2.8s ENC_avg=9572 RF=-1078 LF=+162 RR=-1258 LR=-35789\r\n",
+    "timestamp": 1778709536534,
+    "time": "2026-05-14 05:58:56:534",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=2.9s ENC_avg=10451 RF=-569 LF=-288 RR=-1443 LR=-39502\r\n",
+    "timestamp": 1778709536637,
+    "time": "2026-05-14 05:58:56:637",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=3.0s ENC_avg=11615 RF=-257 LF=+1156 RR=-855 LR=-44191\r\n",
+    "timestamp": 1778709536747,
+    "time": "2026-05-14 05:58:56:747",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=3.1s ENC_avg=15648 RF=-851 LF=+758 RR=-1014 LR=-59968\r\n",
+    "timestamp": 1778709536853,
+    "time": "2026-05-14 05:58:56:853",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=3.2s ENC_avg=16919 RF=-974 LF=+818 RR=-1061 LR=-64825\r\n",
+    "timestamp": 1778709536957,
+    "time": "2026-05-14 05:58:56:957",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=3.3s ENC_avg=18333 RF=-876 LF=+786 RR=-836 LR=-70835\r\n",
+    "timestamp": 1778709537066,
+    "time": "2026-05-14 05:58:57:066",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=3.4s ENC_avg=1490 RF=-309 LF=+890 RR=-1129 LR=+3632\r\n",
+    "timestamp": 1778709537167,
+    "time": "2026-05-14 05:58:57:167",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=3.5s ENC_avg=12476 RF=-3018 LF=+669 RR=-615 LR=+45604\r\n",
+    "timestamp": 1778709537276,
+    "time": "2026-05-14 05:58:57:276",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=3.6s ENC_avg=13782 RF=-107 LF=+1222 RR=-547 LR=+53250\r\n",
+    "timestamp": 1778709537384,
+    "time": "2026-05-14 05:58:57:384",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=2 Dir=Left T=3.7s ENC_avg=12011 RF=-2418 LF=+946 RR=-1136 LR=+43545\r\n--- StrafeLeft done ---\r\n",
+    "timestamp": 1778709537490,
+    "time": "2026-05-14 05:58:57:490",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 3: Forward 1 cell ---\r\n",
+    "timestamp": 1778709537994,
+    "time": "2026-05-14 05:58:57:994",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Fwd T=0.1s ENC_avg=17853 RF=-55 LF=+285 RR=-2987 LR=+68085\r\n",
+    "timestamp": 1778709538099,
+    "time": "2026-05-14 05:58:58:099",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Fwd T=0.2s ENC_avg=15697 RF=-58 LF=+2176 RR=-4163 LR=+56391\r\n--- Forward done ---\r\n",
+    "timestamp": 1778709538208,
+    "time": "2026-05-14 05:58:58:208",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 3: StrafeLeft 1 cell ---\r\n",
+    "timestamp": 1778709538711,
+    "time": "2026-05-14 05:58:58:711",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.1s ENC_avg=5175 RF=-12 LF=+0 RR=+3798 LR=-16889\r\n",
+    "timestamp": 1778709538817,
+    "time": "2026-05-14 05:58:58:817",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.2s ENC_avg=10154 RF=-18 LF=-2892 RR=+4596 LR=-33111\r\n",
+    "timestamp": 1778709538923,
+    "time": "2026-05-14 05:58:58:923",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.3s ENC_avg=11456 RF=-6172 LF=-4813 RR=+3968 LR=-30869\r\n",
+    "timestamp": 1778709539027,
+    "time": "2026-05-14 05:58:59:027",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.4s ENC_avg=10880 RF=-124 LF=-2356 RR=+5043 LR=-35998\r\n",
+    "timestamp": 1778709539135,
+    "time": "2026-05-14 05:58:59:135",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.5s ENC_avg=14496 RF=-39 LF=-1898 RR=+4607 LR=-51441\r\n",
+    "timestamp": 1778709539243,
+    "time": "2026-05-14 05:58:59:243",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.6s ENC_avg=16729 RF=-3985 LF=-4748 RR=+4793 LR=-53390\r\n",
+    "timestamp": 1778709539344,
+    "time": "2026-05-14 05:58:59:344",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.7s ENC_avg=12413 RF=-3493 LF=+631 RR=-897 LR=-44632\r\n",
+    "timestamp": 1778709539452,
+    "time": "2026-05-14 05:58:59:452",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.8s ENC_avg=9079 RF=-3129 LF=+623 RR=-194 LR=-32367\r\n",
+    "timestamp": 1778709539557,
+    "time": "2026-05-14 05:58:59:557",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=0.9s ENC_avg=8282 RF=-474 LF=+651 RR=-669 LR=-31334\r\n",
+    "timestamp": 1778709539666,
+    "time": "2026-05-14 05:58:59:666",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.0s ENC_avg=7846 RF=-2206 LF=+876 RR=-791 LR=-27511\r\n",
+    "timestamp": 1778709539771,
+    "time": "2026-05-14 05:58:59:771",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.1s ENC_avg=7610 RF=+556 LF=+777 RR=-422 LR=-28684\r\n",
+    "timestamp": 1778709539875,
+    "time": "2026-05-14 05:58:59:875",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.2s ENC_avg=7570 RF=+1606 LF=+442 RR=-722 LR=-27511\r\n",
+    "timestamp": 1778709539985,
+    "time": "2026-05-14 05:58:59:985",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.3s ENC_avg=6229 RF=+881 LF=+592 RR=-586 LR=-22858\r\n",
+    "timestamp": 1778709540086,
+    "time": "2026-05-14 05:59:00:086",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.4s ENC_avg=7593 RF=-1352 LF=+828 RR=-958 LR=-27232\r\n",
+    "timestamp": 1778709540193,
+    "time": "2026-05-14 05:59:00:193",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.5s ENC_avg=7509 RF=-1284 LF=+888 RR=-908 LR=-26955\r\n",
+    "timestamp": 1778709540303,
+    "time": "2026-05-14 05:59:00:303",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.6s ENC_avg=8717 RF=+2103 LF=+800 RR=-690 LR=-31276\r\n",
+    "timestamp": 1778709540412,
+    "time": "2026-05-14 05:59:00:412",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.7s ENC_avg=8185 RF=-496 LF=+517 RR=-492 LR=-31235\r\n",
+    "timestamp": 1778709540512,
+    "time": "2026-05-14 05:59:00:512",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.8s ENC_avg=8863 RF=-1783 LF=+779 RR=-774 LR=-32117\r\n",
+    "timestamp": 1778709540616,
+    "time": "2026-05-14 05:59:00:616",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=1.9s ENC_avg=7998 RF=-983 LF=+749 RR=-457 LR=-29804\r\n",
+    "timestamp": 1778709540728,
+    "time": "2026-05-14 05:59:00:728",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=2.0s ENC_avg=10574 RF=-3040 LF=+560 RR=-848 LR=-37848\r\n",
+    "timestamp": 1778709540833,
+    "time": "2026-05-14 05:59:00:833",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=2.1s ENC_avg=10826 RF=-1742 LF=+839 RR=-940 LR=-39785\r\n",
+    "timestamp": 1778709540939,
+    "time": "2026-05-14 05:59:00:939",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=2.2s ENC_avg=10034 RF=+712 LF=+877 RR=-764 LR=-37782\r\n",
+    "timestamp": 1778709541046,
+    "time": "2026-05-14 05:59:01:046",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=2.3s ENC_avg=9358 RF=-88 LF=+959 RR=-717 LR=-35666\r\n",
+    "timestamp": 1778709541153,
+    "time": "2026-05-14 05:59:01:153",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=2.4s ENC_avg=10009 RF=-909 LF=+974 RR=-1001 LR=-37153\r\n",
+    "timestamp": 1778709541254,
+    "time": "2026-05-14 05:59:01:254",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=2.5s ENC_avg=13297 RF=-1067 LF=+937 RR=-842 LR=-50341\r\n",
+    "timestamp": 1778709541363,
+    "time": "2026-05-14 05:59:01:363",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=2.6s ENC_avg=15704 RF=-943 LF=+992 RR=-565 LR=-60316\r\n",
+    "timestamp": 1778709541469,
+    "time": "2026-05-14 05:59:01:469",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=2.7s ENC_avg=16638 RF=-998 LF=+952 RR=-1213 LR=-63387\r\n",
+    "timestamp": 1778709541576,
+    "time": "2026-05-14 05:59:01:576",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=2.8s ENC_avg=17533 RF=-968 LF=+892 RR=-1126 LR=-67145\r\n",
+    "timestamp": 1778709541682,
+    "time": "2026-05-14 05:59:01:682",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=2.9s ENC_avg=18477 RF=-986 LF=+869 RR=-1036 LR=-71015\r\n",
+    "timestamp": 1778709541787,
+    "time": "2026-05-14 05:59:01:787",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=3.0s ENC_avg=19212 RF=-889 LF=+1077 RR=-836 LR=-74044\r\n",
+    "timestamp": 1778709541894,
+    "time": "2026-05-14 05:59:01:894",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=3.1s ENC_avg=19437 RF=-902 LF=+1153 RR=-996 LR=-74698\r\n",
+    "timestamp": 1778709542000,
+    "time": "2026-05-14 05:59:02:000",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=3.2s ENC_avg=19753 RF=-986 LF=+965 RR=-973 LR=-76088\r\n",
+    "timestamp": 1778709542107,
+    "time": "2026-05-14 05:59:02:107",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=3.3s ENC_avg=19853 RF=-934 LF=+1038 RR=-1097 LR=-76342\r\n",
+    "timestamp": 1778709542209,
+    "time": "2026-05-14 05:59:02:209",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=3.4s ENC_avg=19894 RF=-1053 LF=+922 RR=-958 LR=-76644\r\n",
+    "timestamp": 1778709542319,
+    "time": "2026-05-14 05:59:02:319",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=3.5s ENC_avg=19929 RF=-1041 LF=+875 RR=-953 LR=-76847\r\n",
+    "timestamp": 1778709542425,
+    "time": "2026-05-14 05:59:02:425",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=3.6s ENC_avg=19637 RF=-854 LF=+876 RR=-819 LR=-76001\r\n",
+    "timestamp": 1778709542530,
+    "time": "2026-05-14 05:59:02:530",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=3.7s ENC_avg=19225 RF=-834 LF=+879 RR=-837 LR=-74348\r\n",
+    "timestamp": 1778709542633,
+    "time": "2026-05-14 05:59:02:633",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=3.8s ENC_avg=18391 RF=-1014 LF=+989 RR=-918 LR=-70645\r\n",
+    "timestamp": 1778709542745,
+    "time": "2026-05-14 05:59:02:745",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=3.9s ENC_avg=17631 RF=-1056 LF=+1026 RR=-987 LR=-67454\r\n",
+    "timestamp": 1778709542849,
+    "time": "2026-05-14 05:59:02:849",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=4.0s ENC_avg=17272 RF=-1136 LF=+1026 RR=-953 LR=-65972\r\n",
+    "timestamp": 1778709542951,
+    "time": "2026-05-14 05:59:02:951",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=4.1s ENC_avg=16849 RF=-982 LF=+923 RR=-1012 LR=-64481\r\n",
+    "timestamp": 1778709543056,
+    "time": "2026-05-14 05:59:03:056",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=4.2s ENC_avg=17130 RF=-925 LF=+878 RR=-971 LR=-65747\r\n",
+    "timestamp": 1778709543169,
+    "time": "2026-05-14 05:59:03:169",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=4.3s ENC_avg=17667 RF=-965 LF=+1032 RR=-867 LR=-67805\r\n",
+    "timestamp": 1778709543270,
+    "time": "2026-05-14 05:59:03:270",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=4.4s ENC_avg=18308 RF=-967 LF=+1021 RR=-901 LR=-70341\r\n",
+    "timestamp": 1778709543375,
+    "time": "2026-05-14 05:59:03:375",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=3 Dir=Left T=4.5s ENC_avg=18855 RF=-1004 LF=+1004 RR=-1197 LR=-72214\r\n--- StrafeLeft done ---\r\n",
+    "timestamp": 1778709543494,
+    "time": "2026-05-14 05:59:03:494",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 4: Forward 1 cell ---\r\n",
+    "timestamp": 1778709543989,
+    "time": "2026-05-14 05:59:03:989",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Fwd T=0.1s ENC_avg=18712 RF=+2 LF=+771 RR=-5281 LR=+68795\r\n",
+    "timestamp": 1778709544094,
+    "time": "2026-05-14 05:59:04:094",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Fwd T=0.2s ENC_avg=17699 RF=-5257 LF=+4444 RR=-5082 LR=+56011\r\n--- Forward done ---\r\n",
+    "timestamp": 1778709544198,
+    "time": "2026-05-14 05:59:04:198",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n--- Cycle 4: StrafeLeft 1 cell ---\r\n",
+    "timestamp": 1778709544714,
+    "time": "2026-05-14 05:59:04:714",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.1s ENC_avg=2427 RF=+0 LF=-144 RR=+3956 LR=-5608\r\n",
+    "timestamp": 1778709544817,
+    "time": "2026-05-14 05:59:04:817",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.2s ENC_avg=8936 RF=+0 LF=-190 RR=+4339 LR=-31215\r\n",
+    "timestamp": 1778709544916,
+    "time": "2026-05-14 05:59:04:916",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.3s ENC_avg=12970 RF=-1167 LF=-4657 RR=+4612 LR=-41441\r\n",
+    "timestamp": 1778709545028,
+    "time": "2026-05-14 05:59:05:028",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.4s ENC_avg=13541 RF=-5395 LF=-4919 RR=+4488 LR=-39362\r\n",
+    "timestamp": 1778709545127,
+    "time": "2026-05-14 05:59:05:127",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.5s ENC_avg=12315 RF=-5030 LF=-4898 RR=+4988 LR=-34346\r\n",
+    "timestamp": 1778709545237,
+    "time": "2026-05-14 05:59:05:237",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.6s ENC_avg=12848 RF=-4427 LF=-4829 RR=+5108 LR=-37027\r\n",
+    "timestamp": 1778709545348,
+    "time": "2026-05-14 05:59:05:348",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.7s ENC_avg=9721 RF=-1551 LF=-702 RR=-704 LR=-35928\r\n",
+    "timestamp": 1778709545454,
+    "time": "2026-05-14 05:59:05:454",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.8s ENC_avg=10701 RF=-993 LF=+1352 RR=-781 LR=-39680\r\n",
+    "timestamp": 1778709545559,
+    "time": "2026-05-14 05:59:05:559",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=0.9s ENC_avg=8319 RF=-607 LF=+350 RR=-970 LR=-31349\r\n",
+    "timestamp": 1778709545661,
+    "time": "2026-05-14 05:59:05:661",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=1.0s ENC_avg=6761 RF=-1003 LF=+256 RR=-994 LR=-24792\r\n",
+    "timestamp": 1778709545767,
+    "time": "2026-05-14 05:59:05:767",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=1.1s ENC_avg=6184 RF=-1483 LF=+1343 RR=-556 LR=-21353\r\n",
+    "timestamp": 1778709545879,
+    "time": "2026-05-14 05:59:05:879",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=1.2s ENC_avg=4960 RF=-1038 LF=+1689 RR=-847 LR=-16267\r\n",
+    "timestamp": 1778709545984,
+    "time": "2026-05-14 05:59:05:984",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=1.3s ENC_avg=6133 RF=-196 LF=+2441 RR=-773 LR=-21121\r\n",
+    "timestamp": 1778709546083,
+    "time": "2026-05-14 05:59:06:083",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=1.4s ENC_avg=6586 RF=-231 LF=+1697 RR=-393 LR=-24024\r\n",
+    "timestamp": 1778709546190,
+    "time": "2026-05-14 05:59:06:190",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=1.5s ENC_avg=5479 RF=-1319 LF=+1308 RR=-922 LR=-18368\r\n",
+    "timestamp": 1778709546302,
+    "time": "2026-05-14 05:59:06:302",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=1.6s ENC_avg=8518 RF=-786 LF=+1119 RR=-921 LR=-31246\r\n",
+    "timestamp": 1778709546403,
+    "time": "2026-05-14 05:59:06:403",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=1.7s ENC_avg=11757 RF=-789 LF=+649 RR=-962 LR=-44628\r\n",
+    "timestamp": 1778709546509,
+    "time": "2026-05-14 05:59:06:509",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=1.8s ENC_avg=12809 RF=-604 LF=+629 RR=-832 LR=-49173\r\n",
+    "timestamp": 1778709546613,
+    "time": "2026-05-14 05:59:06:613",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=1.9s ENC_avg=13236 RF=-1406 LF=+541 RR=-678 LR=-50317\r\n",
+    "timestamp": 1778709546726,
+    "time": "2026-05-14 05:59:06:726",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=2.0s ENC_avg=13818 RF=-1009 LF=+818 RR=-537 LR=-52906\r\n",
+    "timestamp": 1778709546826,
+    "time": "2026-05-14 05:59:06:826",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=2.1s ENC_avg=11919 RF=-588 LF=+735 RR=-74 LR=-46277\r\n",
+    "timestamp": 1778709546939,
+    "time": "2026-05-14 05:59:06:939",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=2.2s ENC_avg=11382 RF=-797 LF=+812 RR=-357 LR=-43563\r\n",
+    "timestamp": 1778709547049,
+    "time": "2026-05-14 05:59:07:049",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=2.3s ENC_avg=12122 RF=-727 LF=+808 RR=-851 LR=-46101\r\n",
+    "timestamp": 1778709547143,
+    "time": "2026-05-14 05:59:07:143",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=2.4s ENC_avg=12666 RF=-133 LF=+761 RR=-623 LR=-49148\r\n",
+    "timestamp": 1778709547254,
+    "time": "2026-05-14 05:59:07:254",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=2.5s ENC_avg=11245 RF=-1383 LF=+560 RR=-768 LR=-42269\r\n",
+    "timestamp": 1778709547355,
+    "time": "2026-05-14 05:59:07:355",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=2.6s ENC_avg=11857 RF=-1290 LF=+1026 RR=-1088 LR=-44023\r\n",
+    "timestamp": 1778709547469,
+    "time": "2026-05-14 05:59:07:469",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=2.7s ENC_avg=10721 RF=+667 LF=+593 RR=-810 LR=-40816\r\n",
+    "timestamp": 1778709547568,
+    "time": "2026-05-14 05:59:07:568",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=2.8s ENC_avg=8906 RF=-140 LF=+887 RR=-677 LR=-33917\r\n",
+    "timestamp": 1778709547676,
+    "time": "2026-05-14 05:59:07:676",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=2.9s ENC_avg=9489 RF=-1194 LF=+1559 RR=-1245 LR=-33960\r\n",
+    "timestamp": 1778709547782,
+    "time": "2026-05-14 05:59:07:782",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=3.0s ENC_avg=9971 RF=-1010 LF=+815 RR=-571 LR=-37487\r\n",
+    "timestamp": 1778709547895,
+    "time": "2026-05-14 05:59:07:895",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=3.1s ENC_avg=9017 RF=-729 LF=+530 RR=-815 LR=-33994\r\n",
+    "timestamp": 1778709548003,
+    "time": "2026-05-14 05:59:08:003",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=3.2s ENC_avg=7310 RF=-875 LF=+264 RR=-828 LR=-27274\r\n",
+    "timestamp": 1778709548098,
+    "time": "2026-05-14 05:59:08:098",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=3.3s ENC_avg=6972 RF=-617 LF=-639 RR=-734 LR=-25899\r\n",
+    "timestamp": 1778709548222,
+    "time": "2026-05-14 05:59:08:222",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=3.4s ENC_avg=5578 RF=-1010 LF=-307 RR=-872 LR=-20123\r\n",
+    "timestamp": 1778709548312,
+    "time": "2026-05-14 05:59:08:312",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=3.5s ENC_avg=1330 RF=-540 LF=+1107 RR=-1175 LR=+2499\r\n",
+    "timestamp": 1778709548421,
+    "time": "2026-05-14 05:59:08:421",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=3.6s ENC_avg=1079 RF=-1240 LF=+1117 RR=-1150 LR=+808\r\n",
+    "timestamp": 1778709548525,
+    "time": "2026-05-14 05:59:08:525",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=3.7s ENC_avg=857 RF=-801 LF=+938 RR=-1029 LR=+660\r\n",
+    "timestamp": 1778709548637,
+    "time": "2026-05-14 05:59:08:637",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=3.8s ENC_avg=927 RF=-903 LF=+964 RR=-1057 LR=+785\r\n",
+    "timestamp": 1778709548736,
+    "time": "2026-05-14 05:59:08:736",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=3.9s ENC_avg=870 RF=-801 LF=+1000 RR=-921 LR=+761\r\n",
+    "timestamp": 1778709548842,
+    "time": "2026-05-14 05:59:08:842",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "C=4 Dir=Left T=4.0s ENC_avg=885 RF=-842 LF=+953 RR=-871 LR=+872\r\n--- StrafeLeft done ---\r\n",
+    "timestamp": 1778709548955,
+    "time": "2026-05-14 05:59:08:955",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n=== Stage 6 Complete ===\r\n",
+    "timestamp": 1778709549457,
+    "time": "2026-05-14 05:59:09:457",
+    "display": "ascii"
+  }
+]

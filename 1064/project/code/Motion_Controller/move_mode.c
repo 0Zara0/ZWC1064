@@ -33,9 +33,6 @@ static int16 g_last_raw_count[ENCODER_COUNT] = {0};
 /** @brief 当前移动速度 */
 static float g_move_speed = 0.0f;
 
-/** @brief 减速阶段已进入标志（防止重复降速） */
-static uint8 g_decel_entered = 0;
-
 // ==================================================== 基础运动控制函数 ====================================================
 
 /**
@@ -201,40 +198,32 @@ static void MoveMode_StartDistance(MoveMode_t mode, int32 distance, float speed)
     // 计算目标脉冲数
     g_target_pulse_count = distance * pulse_per_unit;
     g_move_speed = (speed > 0.0f) ? speed : MOVE_DEFAULT_SPEED;
-    g_current_mode = mode;
     g_move_state = MOVE_STATE_RUNNING;
-    g_decel_entered = 0;
 
-    // 启动电机运动
+    // 启动电机运动（同时确定实际运动方向）
     if (distance > 0)
     {
+        g_current_mode = mode;
         MoveMode_SetSpeed(mode, g_move_speed);
     }
     else if (distance < 0)
     {
-        // 反向移动：根据模式选择反向
+        // 反向移动：根据模式选择反向，并记录实际运动方向
         switch (mode)
         {
-            case FORWARD:
-                MoveMode_SetSpeed(BACKWARD, g_move_speed);
-                break;
-            case BACKWARD:
-                MoveMode_SetSpeed(FORWARD, g_move_speed);
-                break;
-            case STRAFE_LEFT:
-                MoveMode_SetSpeed(STRAFE_RIGHT, g_move_speed);
-                break;
-            case STRAFE_RIGHT:
-                MoveMode_SetSpeed(STRAFE_LEFT, g_move_speed);
-                break;
-            default:
-                break;
+            case FORWARD:    g_current_mode = BACKWARD;    break;
+            case BACKWARD:   g_current_mode = FORWARD;     break;
+            case STRAFE_LEFT:  g_current_mode = STRAFE_RIGHT; break;
+            case STRAFE_RIGHT: g_current_mode = STRAFE_LEFT;  break;
+            default:          g_current_mode = STOP;        break;
         }
+        MoveMode_SetSpeed(g_current_mode, g_move_speed);
         g_target_pulse_count = -g_target_pulse_count; // 取绝对值
     }
     else
     {
         // distance = 0，直接完成
+        g_current_mode = STOP;
         g_move_state = MOVE_STATE_FINISHED;
         MoveMode_Stop();
     }
@@ -361,20 +350,16 @@ void MoveMode_DistanceUpdate(void)
     int32 remaining = g_target_pulse_count - abs(avg_delta);
     if (remaining < 0) remaining = 0;
 
-    if (remaining <= MOVE_DECEL_THRESHOLD && remaining > MOVE_POSITION_TOLERANCE)
+    if (remaining > MOVE_POSITION_TOLERANCE)
     {
-        if (!g_decel_entered)
-        {
-            g_decel_entered = 1;
-            MotionPID_SetAllMotorsSpeed(MOVE_DECEL_SPEED);
-        }
+        float dynamic_speed = MOVE_POSITION_KP * (float)remaining;
+        if (dynamic_speed > g_move_speed)
+            dynamic_speed = g_move_speed;
+        if (dynamic_speed < MOVE_POSITION_MIN_SPEED)
+            dynamic_speed = MOVE_POSITION_MIN_SPEED;
+        MoveMode_SetSpeed(g_current_mode, dynamic_speed);
     }
-    else if (remaining > MOVE_DECEL_THRESHOLD)
-    {
-        g_decel_entered = 0;
-    }
-
-    if (remaining <= MOVE_POSITION_TOLERANCE)
+    else
     {
         MoveMode_Stop();
         g_move_state = MOVE_STATE_FINISHED;
@@ -391,7 +376,6 @@ void MoveMode_ResetDistanceState(void)
     g_current_mode = STOP;
     g_target_pulse_count = 0;
     g_move_speed = 0.0f;
-    g_decel_entered = 0;
     MoveMode_Stop();
 }
 

@@ -28,9 +28,9 @@
 
 /** @brief 速度环 PID 比例系数 (Kp) */
 /** @note 增大 Kp 可以加快响应速度，但过大会导致系统震荡 */
-/** @note 修正依据：原 Kp=0.05 时满误差 100 仅产生 5% PWM，远低于克服静摩擦所需的 31%+ */
-/** @note Kp=0.35 时满误差 100 产生 35% PWM，足以克服静摩擦启动电机 */
-#define VELOCITY_PID_KP               (0.35f)
+/** @note Kp=0.35 时比例带仅 271pps，系统退化为 bang-bang 控制，PWM 在 ±100% 振荡 */
+/** @note Kp=0.06 时比例带约 1667pps，占 5000pps 工作范围的 33%，正常调节不饱和 */
+#define VELOCITY_PID_KP               (0.06f)
 
 /** @brief 速度环 PID 积分系数 (Ki) */
 /** @note 增大 Ki 可以减小稳态误差，但过大会导致超调和震荡 */
