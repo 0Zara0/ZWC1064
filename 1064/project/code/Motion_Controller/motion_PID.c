@@ -15,6 +15,15 @@ MotorController_t g_motor_controller = {0};
 /** @brief 系统初始化标志，防止重复初始化（0=未初始化，1=已初始化） */
 uint8 g_system_initialized = 0;
 
+/** @brief 航向保持使能标志：1=使能（直行时锁定目标偏航角），0=关闭 */
+uint8 g_heading_hold_enabled = 0;
+
+/** @brief 航向保持的目标偏航角（单位：度，0~360） */
+float g_heading_target = 0.0f;
+
+/** @brief 上一次角度PID修正量缓存（用于IMU未更新周期时保持输出） */
+static float g_heading_last_correction = 0.0f;
+
 // ==================================================== 编码器配置 ====================================================
 // 正交编码器与 MCU 引脚的硬件连接定义
 // 编码器 1 连接到 QTIMER1_ENCODER1 通道，使用 GPIO 引脚 C0 和 C1
@@ -71,13 +80,12 @@ void MotionPID_Encoder_Init(void)
 }
 
 /**
- * @brief 初始化 IMU963RA 六轴惯性测量单元
- * @return uint8 初始化状态码，0 表示初始化成功，非 0 表示失败
+ * @brief 初始化 IMU963RA 六轴惯性测量单元（含磁力计校准和卡尔曼滤波融合）
  * @note IMU 提供加速度、角速度和磁场强度数据，用于姿态解算
  */
 void MotionPID_IMU_Init(void)
 {
-    imu963ra_init();
+    imu963_init_with_calibration(200, 10);
 }
 
 /**
@@ -104,7 +112,10 @@ void MotionPID_Sensor_Init(void)
     
     // 初始化速度环 PID 控制器，加载默认 PID 参数配置
     VelocityPID_InitAll();
-    
+
+    // 初始化角度环 PID 控制器（航向保持用）
+    MotionPID_InitHeadingHold();
+
     // 延时 100ms 等待传感器上电稳定并完成内部自检
     system_delay_ms(100);
 }
@@ -123,28 +134,24 @@ void MotionPID_ReadEncoderData(void)
 }
 
 /**
- * @brief 读取 IMU963RA 九轴传感器数据
- * @note 依次读取加速度计、陀螺仪和磁力计数据并存储到全局结构体
+ * @brief 读取 IMU963RA 九轴传感器数据（从 imu963_data 全局结构体读取物理值）
+ * @note imu963_data 由 imu963_get_angle() 内部的 imu963_update() 定期刷新
  */
 void MotionPID_ReadIMUData(void)
 {
-    // 调用底层驱动读取三轴加速度原始数据
-    imu963ra_get_acc();
-    g_sensor_data.acc_x = imu963ra_acc_transition(imu963ra_acc_x);
-    g_sensor_data.acc_y = imu963ra_acc_transition(imu963ra_acc_y);
-    g_sensor_data.acc_z = imu963ra_acc_transition(imu963ra_acc_z);
+    g_sensor_data.acc_x = imu963_data.acc_x;
+    g_sensor_data.acc_y = imu963_data.acc_y;
+    g_sensor_data.acc_z = imu963_data.acc_z;
     
-    // 读取陀螺仪数据
-    imu963ra_get_gyro();
-    g_sensor_data.gyro_x = imu963ra_gyro_transition(imu963ra_gyro_x);
-    g_sensor_data.gyro_y = imu963ra_gyro_transition(imu963ra_gyro_y);
-    g_sensor_data.gyro_z = imu963ra_gyro_transition(imu963ra_gyro_z);
+    g_sensor_data.gyro_x = imu963_data.gyro_x;
+    g_sensor_data.gyro_y = imu963_data.gyro_y;
+    g_sensor_data.gyro_z = imu963_data.gyro_z;
     
-    // 读取磁力计数据
-    imu963ra_get_mag();
-    g_sensor_data.mag_x = imu963ra_mag_transition(imu963ra_mag_x);
-    g_sensor_data.mag_y = imu963ra_mag_transition(imu963ra_mag_y);
-    g_sensor_data.mag_z = imu963ra_mag_transition(imu963ra_mag_z);
+    g_sensor_data.mag_x = imu963_data.mag_x;
+    g_sensor_data.mag_y = imu963_data.mag_y;
+    g_sensor_data.mag_z = imu963_data.mag_z;
+    
+    g_sensor_data.yaw = imu963_data.angle_deg;
 }
 
 /**
@@ -257,17 +264,47 @@ void pit_handler(void)
 {
     MotionPID_UpdateSensorData();
 
+    float angle_correction = 0.0f;
+    if (g_heading_hold_enabled)
+    {
+        static uint8 imu_divider = 0;
+        imu_divider++;
+        if (imu_divider >= 5)
+        {
+            imu_divider = 0;
+            float current_angle = imu963_get_angle();
+            angle_correction = AnglePID_Calculate(&g_angle_pid_controller, g_heading_target, current_angle, 0.010f);
+            g_heading_last_correction = angle_correction;
+        }
+        else
+        {
+            angle_correction = g_heading_last_correction;
+        }
+    }
+
     for (uint8 i = 0; i < ENCODER_COUNT; i++)
     {
         float current_speed = EncoderSpeedCalc_GetFilteredSpeed(i);
-        
-        // 若电机方向被软件反转，编码器反馈也需同步取反，确保 PID 形成负反馈
+
         if (g_motor_controller.motor[i].dir_inverted)
         {
             current_speed = -current_speed;
         }
-        
+
         float target_speed = g_motor_controller.target_speed[i];
+
+        if (g_heading_hold_enabled && angle_correction != 0.0f)
+        {
+            if (i == MOTOR_RIGHT_FRONT || i == MOTOR_RIGHT_REAR)
+            {
+                target_speed -= angle_correction;
+            }
+            else
+            {
+                target_speed += angle_correction;
+            }
+        }
+
         float pid_output = VelocityPID_Calculate(i, target_speed, current_speed, SENSOR_UPDATE_PERIOD_MS / 1000.0f);
         VelocityPID_ExecuteMotorControl(i, &g_motor_controller.motor[i]);
     }
@@ -317,6 +354,33 @@ float MotionPID_GetActualSpeed(uint8 motor_index)
         return EncoderSpeedCalc_GetFilteredSpeed(motor_index);
     }
     return 0.0f;
+}
+
+void MotionPID_InitHeadingHold(void)
+{
+    AnglePID_Init(&g_angle_pid_controller,
+                  ANGLE_PID_KP, ANGLE_PID_KI, ANGLE_PID_KD,
+                  ANGLE_PID_OUTPUT_LIMIT, ANGLE_PID_INTEGRAL_LIMIT);
+    g_heading_hold_enabled = 0;
+    g_heading_target = 0.0f;
+    g_heading_last_correction = 0.0f;
+}
+
+void MotionPID_EnableHeadingHold(void)
+{
+    if (!g_angle_pid_controller.initialized)
+        return;
+
+    float current_angle = imu963_get_angle();
+    g_heading_target = current_angle;
+    g_heading_hold_enabled = 1;
+    AnglePID_Reset(&g_angle_pid_controller);
+}
+
+void MotionPID_DisableHeadingHold(void)
+{
+    g_heading_hold_enabled = 0;
+    AnglePID_Reset(&g_angle_pid_controller);
 }
 
 

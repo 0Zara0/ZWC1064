@@ -34,9 +34,9 @@
 
 /** @brief 速度环 PID 积分系数 (Ki) */
 /** @note 增大 Ki 可以减小稳态误差，但过大会导致超调和震荡 */
-/** @note 修正依据：原 Ki=0.001 积分累积过慢，堵转时 500ms 内仅累积约 0.025% 修正，完全无效 */
-/** @note Ki=0.005 在 500ms 内可累积约 12.5% 修正，能有效补偿静摩擦 */
-#define VELOCITY_PID_KI               (0.005f)
+/** @note 修正依据：Ki=0.005 时，稳态误差 20 脉冲/s 下需 50 秒才累积 5% PWM，实质无效 */
+/** @note Ki=0.08 时，稳态误差 20 脉冲/s 下约 3 秒可累积 5% PWM，能有效消除稳态偏差 */
+#define VELOCITY_PID_KI               (0.08f)
 
 /** @brief 速度环 PID 微分系数 (Kd) */
 /** @note 增大 Kd 可以抑制震荡和超调，但过大会放大噪声 */
@@ -59,9 +59,9 @@
 /** @note 防止积分累积过大导致积分饱和 */
 #define VELOCITY_PID_INTEGRAL_MAX     (1000.0f)
 
-/** @brief 输出限幅值 (PWM 占空比百分比 -100~100) */
-#define VELOCITY_PID_OUTPUT_MAX       (100.0f)
-#define VELOCITY_PID_OUTPUT_MIN       (-100.0f)
+/** @brief 输出限幅值 (PWM 占空比百分比 -95~95, 预留 5% 给 H 桥自举电容充电) */
+#define VELOCITY_PID_OUTPUT_MAX       (95.0f)
+#define VELOCITY_PID_OUTPUT_MIN       (-95.0f)
 
 // ==================================================== 数据结构定义 ==================================================
 
@@ -106,10 +106,30 @@ typedef struct
     uint8 enabled;              // 使能标志
 } VelocityPIDController_t;
 
+// ==================================================== 角度环 PID 配置参数 ========================================
+
+#define ANGLE_PID_KP                    (2.0f)
+#define ANGLE_PID_KI                    (0.1f)
+#define ANGLE_PID_KD                    (0.5f)
+#define ANGLE_PID_OUTPUT_LIMIT          (50.0f)
+#define ANGLE_PID_INTEGRAL_LIMIT        (200.0f)
+
+typedef struct
+{
+    float Kp, Ki, Kd;
+    float error, error_last, error_sum;
+    float output;
+    float target_angle, current_angle;
+    float output_limit;
+    float integral_limit;
+    uint8 initialized, enabled;
+} AnglePIDController_t;
+
 // ==================================================== 全局变量声明 ================================================
 
 extern EncoderSpeedCalculator_t g_encoder_speed_calc[ENCODER_COUNT];
 extern VelocityPIDController_t g_velocity_pid_controller[ENCODER_COUNT];
+extern AnglePIDController_t g_angle_pid_controller;
 
 // ==================================================== 函数声明 ====================================================
 
@@ -194,5 +214,9 @@ void VelocityPID_Reset(uint8 pid_index);
  *       自动处理正反转和 PWM 占空比设置
  */
 void VelocityPID_ExecuteMotorControl(uint8 pid_index, DCMotor *motor);
+
+void AnglePID_Init(AnglePIDController_t *pid, float Kp, float Ki, float Kd, float output_limit, float integral_limit);
+float AnglePID_Calculate(AnglePIDController_t *pid, float target_angle, float current_angle, float dt);
+void AnglePID_Reset(AnglePIDController_t *pid);
 
 #endif //PID_ALGORITHM_H

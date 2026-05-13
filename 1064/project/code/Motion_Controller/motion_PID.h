@@ -3,13 +3,33 @@
 #ifndef MOTION_PID_H
 #define MOTION_PID_H
 
-#include "zf_device_imu963ra.h"
+#include "imu963.h"
 #include "zf_driver_encoder.h"
 #include "zf_driver_pit.h"
 #include "dc_motor.h"
 
 // 编码器数量定义（4 个电机）
 #define ENCODER_COUNT   (4)
+
+/**
+ * @brief 电机索引定义（四轮驱动，麦克纳姆轮布局，实测验证）
+ * 电机布局：
+ *       车头 (前方)
+ *   ┌─────────────┐
+ *   │  1       0  │
+ *   │  LF     RF  │
+ *   │             │
+ *   │  LR     RR  │
+ *   │  3       2  │
+ *   └─────────────┘
+ *
+ *   LF: 左前轮，RF: 右前轮
+ *   LR: 左后轮，RR: 右后轮
+ */
+#define MOTOR_LEFT_FRONT    1   // 左前轮电机索引 (实测: 电机1=LF)
+#define MOTOR_RIGHT_FRONT   0   // 右前轮电机索引 (实测: 电机0=RF)
+#define MOTOR_RIGHT_REAR    2   // 右后轮电机索引
+#define MOTOR_LEFT_REAR     3   // 左后轮电机索引
 
 // 定时器配置
 #define SENSOR_TIMER_CH         PIT_CH0               // 使用 PIT 通道 0
@@ -83,5 +103,11 @@ void MotionPID_ResetTimer(void);                        // 重置定时器
 void MotionPID_SetTargetSpeed(uint8 motor_index, float target_speed);  // 设置单个电机目标速度（脉冲/秒）
 void MotionPID_SetAllMotorsSpeed(float target_speed);                  // 设置所有电机相同的目标速度
 float MotionPID_GetActualSpeed(uint8 motor_index);                     // 获取单个电机的实际速度
+
+void MotionPID_EnableHeadingHold(void);
+void MotionPID_DisableHeadingHold(void);
+void MotionPID_InitHeadingHold(void);
+extern uint8 g_heading_hold_enabled;
+extern float g_heading_target;
 
 #endif //MOTION_PID_H

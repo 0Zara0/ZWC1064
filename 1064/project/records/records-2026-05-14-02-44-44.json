@@ -1,0 +1,639 @@
+[
+  {
+    "type": "read",
+    "data": "�=��7��@\u0000BB�!ehK��!a����@\u0001!!!���",
+    "timestamp": 1778697820367,
+    "time": "2026-05-14 02:43:40:367",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "    IMU + Encoder initialized\r\n    Encoders cleared\r\n[2] Initializing motors...\r\n",
+    "timestamp": 1778697820492,
+    "time": "2026-05-14 02:43:40:492",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "    4 motors initialized\r\n\r\n========================================\r\n   === Stage 2: Single Motor Open-Loop ===\r\n========================================\r\n   Each motor: +20% PWM 2s -> stop 1s -> -20% 2s -> stop 1s\r\n   Expect: +PWM forward, encoder count increases\r\n   Display: raw ENC + signed ENC (ENC0/2 reversed)\r\n========================================\r\n\r\n-------- Motor 0 (RF) +20% PWM --------\r\n  Time    ENC_raw  ENC_signed\r\n  ----    -------  ----------\r\n",
+    "timestamp": 1778697820541,
+    "time": "2026-05-14 02:43:40:541",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.2s   -2011      2011\r\n",
+    "timestamp": 1778697820745,
+    "time": "2026-05-14 02:43:40:745",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.4s   -4748      4748\r\n",
+    "timestamp": 1778697820946,
+    "time": "2026-05-14 02:43:40:946",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.6s   -7474      7474\r\n",
+    "timestamp": 1778697821148,
+    "time": "2026-05-14 02:43:41:148",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.8s   -10227     10227\r\n",
+    "timestamp": 1778697821350,
+    "time": "2026-05-14 02:43:41:350",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.0s   -13017     13017\r\n",
+    "timestamp": 1778697821552,
+    "time": "2026-05-14 02:43:41:552",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.2s   -15846     15846\r\n",
+    "timestamp": 1778697821755,
+    "time": "2026-05-14 02:43:41:755",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.4s   -18712     18712\r\n",
+    "timestamp": 1778697821959,
+    "time": "2026-05-14 02:43:41:959",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.6s   -21583     21583\r\n",
+    "timestamp": 1778697822159,
+    "time": "2026-05-14 02:43:42:159",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.8s   -24446     24446\r\n",
+    "timestamp": 1778697822362,
+    "time": "2026-05-14 02:43:42:362",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   2.0s   -27315     27315\r\n",
+    "timestamp": 1778697822564,
+    "time": "2026-05-14 02:43:42:564",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n-------- Motor 0 (RF) -20% PWM --------\r\n  Time    ENC_raw  ENC_signed\r\n  ----    -------  ----------\r\n",
+    "timestamp": 1778697823575,
+    "time": "2026-05-14 02:43:43:575",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.2s    2075     -2075\r\n",
+    "timestamp": 1778697823777,
+    "time": "2026-05-14 02:43:43:777",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.4s    4919     -4919\r\n",
+    "timestamp": 1778697823978,
+    "time": "2026-05-14 02:43:43:978",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.6s    7807     -7807\r\n",
+    "timestamp": 1778697824183,
+    "time": "2026-05-14 02:43:44:183",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.8s   10648     -10648\r\n",
+    "timestamp": 1778697824383,
+    "time": "2026-05-14 02:43:44:383",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.0s   13557     -13557\r\n",
+    "timestamp": 1778697824587,
+    "time": "2026-05-14 02:43:44:587",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.2s   16449     -16449\r\n",
+    "timestamp": 1778697824788,
+    "time": "2026-05-14 02:43:44:788",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.4s   19344     -19344\r\n",
+    "timestamp": 1778697824992,
+    "time": "2026-05-14 02:43:44:992",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.6s   22265     -22265\r\n",
+    "timestamp": 1778697825193,
+    "time": "2026-05-14 02:43:45:193",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.8s   25194     -25194\r\n",
+    "timestamp": 1778697825396,
+    "time": "2026-05-14 02:43:45:396",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   2.0s   28151     -28151\r\n",
+    "timestamp": 1778697825597,
+    "time": "2026-05-14 02:43:45:597",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n-------- Motor 1 (LF) +20% PWM --------\r\n  Time    ENC_raw  ENC_signed\r\n  ----    -------  ----------\r\n",
+    "timestamp": 1778697826609,
+    "time": "2026-05-14 02:43:46:609",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.2s    1271      1271\r\n",
+    "timestamp": 1778697826812,
+    "time": "2026-05-14 02:43:46:812",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.4s    3337      3337\r\n",
+    "timestamp": 1778697827012,
+    "time": "2026-05-14 02:43:47:012",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.6s    5411      5411\r\n",
+    "timestamp": 1778697827214,
+    "time": "2026-05-14 02:43:47:214",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.8s    7780      7780\r\n",
+    "timestamp": 1778697827421,
+    "time": "2026-05-14 02:43:47:421",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.0s   10223     10223\r\n",
+    "timestamp": 1778697827619,
+    "time": "2026-05-14 02:43:47:619",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.2s   12693     12693\r\n",
+    "timestamp": 1778697827824,
+    "time": "2026-05-14 02:43:47:824",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.4s   15196     15196\r\n",
+    "timestamp": 1778697828027,
+    "time": "2026-05-14 02:43:48:027",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.6s   17665     17665\r\n",
+    "timestamp": 1778697828229,
+    "time": "2026-05-14 02:43:48:229",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.8s   20191     20191\r\n",
+    "timestamp": 1778697828428,
+    "time": "2026-05-14 02:43:48:428",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   2.0s   22666     22666\r\n",
+    "timestamp": 1778697828631,
+    "time": "2026-05-14 02:43:48:631",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n-------- Motor 1 (LF) -20% PWM --------\r\n  Time    ENC_raw  ENC_signed\r\n  ----    -------  ----------\r\n",
+    "timestamp": 1778697829643,
+    "time": "2026-05-14 02:43:49:643",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.2s   -1851     -1851\r\n",
+    "timestamp": 1778697829843,
+    "time": "2026-05-14 02:43:49:843",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.4s   -4416     -4416\r\n",
+    "timestamp": 1778697830048,
+    "time": "2026-05-14 02:43:50:048",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.6s   -7041     -7041\r\n",
+    "timestamp": 1778697830253,
+    "time": "2026-05-14 02:43:50:253",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.8s   -9664     -9664\r\n",
+    "timestamp": 1778697830451,
+    "time": "2026-05-14 02:43:50:451",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.0s   -12313     -12313\r\n",
+    "timestamp": 1778697830651,
+    "time": "2026-05-14 02:43:50:651",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.2s   -14935     -14935\r\n",
+    "timestamp": 1778697830858,
+    "time": "2026-05-14 02:43:50:858",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.4s   -17573     -17573\r\n",
+    "timestamp": 1778697831057,
+    "time": "2026-05-14 02:43:51:057",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.6s   -20204     -20204\r\n",
+    "timestamp": 1778697831260,
+    "time": "2026-05-14 02:43:51:260",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.8s   -22837     -22837\r\n",
+    "timestamp": 1778697831465,
+    "time": "2026-05-14 02:43:51:465",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   2.0s   -25470     -25470\r\n",
+    "timestamp": 1778697831664,
+    "time": "2026-05-14 02:43:51:664",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n-------- Motor 2 (RR) +20% PWM --------\r\n  Time    ENC_raw  ENC_signed\r\n  ----    -------  ----------\r\n",
+    "timestamp": 1778697832679,
+    "time": "2026-05-14 02:43:52:679",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.2s   -1989      1989\r\n",
+    "timestamp": 1778697832880,
+    "time": "2026-05-14 02:43:52:880",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.4s   -4523      4523\r\n",
+    "timestamp": 1778697833079,
+    "time": "2026-05-14 02:43:53:079",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.6s   -7074      7074\r\n",
+    "timestamp": 1778697833281,
+    "time": "2026-05-14 02:43:53:281",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.8s   -9648      9648\r\n",
+    "timestamp": 1778697833484,
+    "time": "2026-05-14 02:43:53:484",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.0s   -12216     12216\r\n",
+    "timestamp": 1778697833690,
+    "time": "2026-05-14 02:43:53:690",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.2s   -14806     14806\r\n",
+    "timestamp": 1778697833889,
+    "time": "2026-05-14 02:43:53:889",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.4s   -17384     17384\r\n",
+    "timestamp": 1778697834096,
+    "time": "2026-05-14 02:43:54:096",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.6s   -19987     19987\r\n",
+    "timestamp": 1778697834299,
+    "time": "2026-05-14 02:43:54:299",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.8s   -22563     22563\r\n",
+    "timestamp": 1778697834501,
+    "time": "2026-05-14 02:43:54:501",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   2.0s   -25151     25151\r\n",
+    "timestamp": 1778697834699,
+    "time": "2026-05-14 02:43:54:699",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n-------- Motor 2 (RR) -20% PWM --------\r\n  Time    ENC_raw  ENC_signed\r\n  ----    -------  ----------\r\n",
+    "timestamp": 1778697835710,
+    "time": "2026-05-14 02:43:55:710",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.2s    1902     -1902\r\n",
+    "timestamp": 1778697835915,
+    "time": "2026-05-14 02:43:55:915",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.4s    4496     -4496\r\n",
+    "timestamp": 1778697836113,
+    "time": "2026-05-14 02:43:56:113",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.6s    7120     -7120\r\n",
+    "timestamp": 1778697836320,
+    "time": "2026-05-14 02:43:56:320",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.8s    9759     -9759\r\n",
+    "timestamp": 1778697836519,
+    "time": "2026-05-14 02:43:56:519",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.0s   12402     -12402\r\n",
+    "timestamp": 1778697836720,
+    "time": "2026-05-14 02:43:56:720",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.2s   15037     -15037\r\n",
+    "timestamp": 1778697836928,
+    "time": "2026-05-14 02:43:56:928",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.4s   17684     -17684\r\n",
+    "timestamp": 1778697837125,
+    "time": "2026-05-14 02:43:57:125",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.6s   20335     -20335\r\n",
+    "timestamp": 1778697837328,
+    "time": "2026-05-14 02:43:57:328",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.8s   22974     -22974\r\n",
+    "timestamp": 1778697837530,
+    "time": "2026-05-14 02:43:57:530",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   2.0s   25615     -25615\r\n",
+    "timestamp": 1778697837733,
+    "time": "2026-05-14 02:43:57:733",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n-------- Motor 3 (LR) +20% PWM --------\r\n  Time    ENC_raw  ENC_signed\r\n  ----    -------  ----------\r\n",
+    "timestamp": 1778697838747,
+    "time": "2026-05-14 02:43:58:747",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.2s    1094      1094\r\n",
+    "timestamp": 1778697838945,
+    "time": "2026-05-14 02:43:58:945",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.4s    2751      2751\r\n",
+    "timestamp": 1778697839148,
+    "time": "2026-05-14 02:43:59:148",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.6s    4424      4424\r\n",
+    "timestamp": 1778697839350,
+    "time": "2026-05-14 02:43:59:350",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.8s    6190      6190\r\n",
+    "timestamp": 1778697839552,
+    "time": "2026-05-14 02:43:59:552",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.0s    8033      8033\r\n",
+    "timestamp": 1778697839755,
+    "time": "2026-05-14 02:43:59:755",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.2s    9836      9836\r\n",
+    "timestamp": 1778697839957,
+    "time": "2026-05-14 02:43:59:957",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.4s   11611     11611\r\n",
+    "timestamp": 1778697840164,
+    "time": "2026-05-14 02:44:00:164",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.6s   13496     13496\r\n",
+    "timestamp": 1778697840372,
+    "time": "2026-05-14 02:44:00:372",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.8s   15368     15368\r\n",
+    "timestamp": 1778697840564,
+    "time": "2026-05-14 02:44:00:564",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   2.0s   17133     17133\r\n",
+    "timestamp": 1778697840767,
+    "time": "2026-05-14 02:44:00:767",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n-------- Motor 3 (LR) -20% PWM --------\r\n  Time    ENC_raw  ENC_signed\r\n  ----    -------  ----------\r\n",
+    "timestamp": 1778697841776,
+    "time": "2026-05-14 02:44:01:776",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.2s   -1151     -1151\r\n",
+    "timestamp": 1778697841979,
+    "time": "2026-05-14 02:44:01:979",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.4s   -3020     -3020\r\n",
+    "timestamp": 1778697842183,
+    "time": "2026-05-14 02:44:02:183",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.6s   -4828     -4828\r\n",
+    "timestamp": 1778697842396,
+    "time": "2026-05-14 02:44:02:396",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   0.8s   -6683     -6683\r\n",
+    "timestamp": 1778697842586,
+    "time": "2026-05-14 02:44:02:586",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.0s   -8615     -8615\r\n",
+    "timestamp": 1778697842789,
+    "time": "2026-05-14 02:44:02:789",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.2s   -10554     -10554\r\n",
+    "timestamp": 1778697842997,
+    "time": "2026-05-14 02:44:02:997",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.4s   -12391     -12391\r\n",
+    "timestamp": 1778697843193,
+    "time": "2026-05-14 02:44:03:193",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.6s   -14283     -14283\r\n",
+    "timestamp": 1778697843396,
+    "time": "2026-05-14 02:44:03:396",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   1.8s   -16243     -16243\r\n",
+    "timestamp": 1778697843599,
+    "time": "2026-05-14 02:44:03:599",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "   2.0s   -18175     -18175\r\n",
+    "timestamp": 1778697843809,
+    "time": "2026-05-14 02:44:03:809",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n=== Stage 2 Complete ===\r\nVerify: +PWM -> ENC_signed positive for all 4 motors\r\n",
+    "timestamp": 1778697844816,
+    "time": "2026-05-14 02:44:04:816",
+    "display": "ascii"
+  }
+]
