@@ -75,6 +75,8 @@ SokoMapStatus SokoMap_IntArrayToMap(const int num[SOKOMAP_ARRAY_LEN],
  */
 SokoMapStatus SokoMap_MarkNearest(int map[SOKOMAP_ROW][SOKOMAP_COL], uint8_t tag);
 
+
+
 /* Optional helper: readable status string, no printf dependency. */
 const char *SokoMap_StatusString(SokoMapStatus status);
 

@@ -8,8 +8,13 @@
 extern "C" {
 #endif
 
+#ifndef SOKOBAN_MAP_ROW
 #define SOKOBAN_MAP_ROW 10
+#endif
+
+#ifndef SOKOBAN_MAP_COL
 #define SOKOBAN_MAP_COL 14
+#endif
 #define SOKOBAN_MAX_STEP 256
 
 /*

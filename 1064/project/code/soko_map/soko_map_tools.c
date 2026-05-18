@@ -313,6 +313,14 @@ SokoMapStatus SokoMap_MarkNearest(int map[SOKOMAP_ROW][SOKOMAP_COL], uint8_t tag
     return SOKOMAP_ERR_NO_TARGET;
 }
 
+void ReloadNummap_signed(int*num_map,int map[][SOKOMAP_COL])
+{
+	for (uint16_t i = 0; i < SOKOMAP_ARRAY_LEN; i++)
+	{
+			num_map[i] = map[i / SOKOMAP_COL][i % SOKOMAP_COL];
+	}
+}
+
 const char *SokoMap_StatusString(SokoMapStatus status)
 {
     switch (status) {

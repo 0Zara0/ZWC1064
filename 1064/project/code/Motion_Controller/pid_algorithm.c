@@ -13,6 +13,12 @@ EncoderSpeedCalculator_t g_encoder_speed_calc[ENCODER_COUNT] = {0};
 /** @brief 速度环 PID 控制器数组 (4 个电机) */
 VelocityPIDController_t g_velocity_pid_controller[ENCODER_COUNT] = {0};
 
+/** @brief 角度环 PID 控制器 */
+AnglePIDController_t g_angle_pid_controller = {0};
+
+/** @brief 角度 PID 微分项低通滤波器状态 */
+static float g_angle_pid_derivative_filtered = 0.0f;
+
 // ==================================================== 静态函数声明 ================================================
 
 /**
@@ -360,8 +366,8 @@ void VelocityPID_ExecuteMotorControl(uint8 pid_index, DCMotor *motor)
 
     float pid_output = g_velocity_pid_controller[pid_index].output;
 
-    if (pid_output > 100.0f) pid_output = 100.0f;
-    if (pid_output < -100.0f) pid_output = -100.0f;
+    if (pid_output > VELOCITY_PID_OUTPUT_MAX) pid_output = VELOCITY_PID_OUTPUT_MAX;
+    if (pid_output < VELOCITY_PID_OUTPUT_MIN) pid_output = VELOCITY_PID_OUTPUT_MIN;
 
     if (pid_output > 0.0f && pid_output < 3.0f)
     {
@@ -373,4 +379,78 @@ void VelocityPID_ExecuteMotorControl(uint8 pid_index, DCMotor *motor)
     }
 
     DCMotor_SetSpeed(motor, pid_output);
+}
+
+
+void AnglePID_Init(AnglePIDController_t *pid, float Kp, float Ki, float Kd, float output_limit, float integral_limit)
+{
+    pid->Kp = Kp;
+    pid->Ki = Ki;
+    pid->Kd = Kd;
+    pid->error = 0.0f;
+    pid->error_last = 0.0f;
+    pid->error_sum = 0.0f;
+    pid->output = 0.0f;
+    pid->target_angle = 0.0f;
+    pid->current_angle = 0.0f;
+    pid->output_limit = output_limit;
+    pid->integral_limit = integral_limit;
+    pid->initialized = 1;
+    pid->enabled = 0;
+}
+
+float AnglePID_Calculate(AnglePIDController_t *pid, float target_angle, float current_angle, float dt)
+{
+    if (!pid->initialized)
+        return 0.0f;
+
+    pid->target_angle = target_angle;
+    pid->current_angle = current_angle;
+
+    float error = target_angle - current_angle;
+    if (error > 180.0f)
+        error -= 360.0f;
+    else if (error < -180.0f)
+        error += 360.0f;
+
+    pid->error = error;
+
+    pid->error_sum += error * dt;
+
+    if (pid->error_sum > pid->integral_limit)
+        pid->error_sum = pid->integral_limit;
+    else if (pid->error_sum < -pid->integral_limit)
+        pid->error_sum = -pid->integral_limit;
+
+    float error_derivative;
+    if (dt > 0.0001f)
+        error_derivative = (error - pid->error_last) / dt;
+    else
+        error_derivative = 0.0f;
+
+    const float alpha = 0.1f;
+    g_angle_pid_derivative_filtered = g_angle_pid_derivative_filtered * (1.0f - alpha) + error_derivative * alpha;
+
+    pid->output = pid->Kp * error
+                + pid->Ki * pid->error_sum
+                + pid->Kd * g_angle_pid_derivative_filtered;
+
+    if (pid->output > pid->output_limit)
+        pid->output = pid->output_limit;
+    else if (pid->output < -pid->output_limit)
+        pid->output = -pid->output_limit;
+
+    pid->error_last = error;
+
+    return pid->output;
+}
+
+void AnglePID_Reset(AnglePIDController_t *pid)
+{
+    pid->error = 0.0f;
+    pid->error_last = 0.0f;
+    pid->error_sum = 0.0f;
+    pid->output = 0.0f;
+    pid->enabled = 0;
+    g_angle_pid_derivative_filtered = 0.0f;
 }

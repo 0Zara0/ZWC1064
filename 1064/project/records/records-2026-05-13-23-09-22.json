@@ -1,0 +1,478 @@
+[
+  {
+    "type": "read",
+    "data": "   Motion Control Test System - Stage 3\r\n[1] Initializing sensors...\r\n",
+    "timestamp": 1778684931691,
+    "time": "2026-05-13 23:08:51:691",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "/* Copy these four lines to imu963.h */\r\n#define IMU963_MAG_X_OFFSET_UT               (38.6991f)\r\n#define IMU963_MAG_Y_OFFSET_UT               (-20614521.1350f)\r\n#define IMU963_MAG_X_SCALE                   (1531.0405f)\r\n#define IMU963_MAG_Y_SCALE                   (0.5002f)\r\n",
+    "timestamp": 1778684933956,
+    "time": "2026-05-13 23:08:53:956",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "    IMU + Encoder initialized\r\n    Encoders cleared\r\n[2] Initializing motors...\r\n",
+    "timestamp": 1778684934967,
+    "time": "2026-05-13 23:08:54:967",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "    4 motors initialized\r\n\r\n========================================\r\n   === Stage 3: Four-Wheel Open-Loop ===\r\n========================================\r\n   Each mode: 30% PWM for 3s, then stop 1.5s\r\n   Observe: chassis moves in expected direction\r\n========================================\r\n\r\n========================================\r\n  Forward  START\r\n  M0(RF):+30  M1(LF):+30  M2(RR):+30  M3(LR):+30\r\n========================================\r\n",
+    "timestamp": 1778684935016,
+    "time": "2026-05-13 23:08:55:016",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.2s  ENC0:-3238(+3238)  ENC1: 2877(+2877)  ENC2:    0(+0)  ENC3: 1503(+1503)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684935223,
+    "time": "2026-05-13 23:08:55:223",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.4s  ENC0:-8059(+8059)  ENC1: 7237(+7237)  ENC2:    0(+0)  ENC3: 4030(+4030)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684935432,
+    "time": "2026-05-13 23:08:55:432",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.6s  ENC0:-12998(+12998)  ENC1:11695(+11695)  ENC2:    0(+0)  ENC3: 6673(+6673)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684935641,
+    "time": "2026-05-13 23:08:55:641",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.8s  ENC0:-18087(+18087)  ENC1:16253(+16253)  ENC2:    0(+0)  ENC3: 9491(+9491)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684935849,
+    "time": "2026-05-13 23:08:55:849",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.0s  ENC0:-23229(+23229)  ENC1:20880(+20880)  ENC2:    0(+0)  ENC3:12381(+12381)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684936057,
+    "time": "2026-05-13 23:08:56:057",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.2s  ENC0:-28387(+28387)  ENC1:25530(+25530)  ENC2:    0(+0)  ENC3:15360(+15360)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684936266,
+    "time": "2026-05-13 23:08:56:266",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.4s  ENC0:32201(-32201)  ENC1:30162(+30162)  ENC2:    0(+0)  ENC3:18366(+18366)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684936474,
+    "time": "2026-05-13 23:08:56:474",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.6s  ENC0:27126(-27126)  ENC1:-30756(-30756)  ENC2:    0(+0)  ENC3:21387(+21387)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684936682,
+    "time": "2026-05-13 23:08:56:682",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.8s  ENC0:21990(-21990)  ENC1:-26111(-26111)  ENC2:    0(+0)  ENC3:24355(+24355)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684936891,
+    "time": "2026-05-13 23:08:56:891",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.0s  ENC0:16840(-16840)  ENC1:-21428(-21428)  ENC2:    0(+0)  ENC3:27285(+27285)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684937099,
+    "time": "2026-05-13 23:08:57:099",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.2s  ENC0:11668(-11668)  ENC1:-16728(-16728)  ENC2:    0(+0)  ENC3:30323(+30323)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684937309,
+    "time": "2026-05-13 23:08:57:309",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.4s  ENC0: 6488(-6488)  ENC1:-12037(-12037)  ENC2:    0(+0)  ENC3:-32266(-32266)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684937516,
+    "time": "2026-05-13 23:08:57:516",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.6s  ENC0: 1323(-1323)  ENC1:-7414(-7414)  ENC2:    0(+0)  ENC3:-29166(-29166)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684937724,
+    "time": "2026-05-13 23:08:57:724",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.8s  ENC0:-3806(+3806)  ENC1:-2779(-2779)  ENC2:    0(+0)  ENC3:-26331(-26331)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684937933,
+    "time": "2026-05-13 23:08:57:933",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  3.0s  ENC0:-8936(+8936)  ENC1: 1913(+1913)  ENC2:    0(+0)  ENC3:-23317(-23317)  GyroZ: +0.2\r\n----------------------------------------\r\n  Forward  STOP (1.5s)\r\n\r\n",
+    "timestamp": 1778684938149,
+    "time": "2026-05-13 23:08:58:149",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n========================================\r\n  Backward  START\r\n  M0(RF):-30  M1(LF):-30  M2(RR):-30  M3(LR):-30\r\n========================================\r\n",
+    "timestamp": 1778684939664,
+    "time": "2026-05-13 23:08:59:664",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.2s  ENC0: 3584(-3584)  ENC1:-3222(-3222)  ENC2:    0(+0)  ENC3: 2250(+2250)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684939870,
+    "time": "2026-05-13 23:08:59:870",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.4s  ENC0: 8705(-8705)  ENC1:-7769(-7769)  ENC2:    0(+0)  ENC3: 5250(+5250)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684940079,
+    "time": "2026-05-13 23:09:00:079",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.6s  ENC0:13921(-13921)  ENC1:-12430(-12430)  ENC2:    0(+0)  ENC3: 8194(+8194)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684940286,
+    "time": "2026-05-13 23:09:00:286",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.8s  ENC0:19163(-19163)  ENC1:-17148(-17148)  ENC2:    0(+0)  ENC3:11350(+11350)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684940495,
+    "time": "2026-05-13 23:09:00:495",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.0s  ENC0:24410(-24410)  ENC1:-21885(-21885)  ENC2:    0(+0)  ENC3:14161(+14161)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684940704,
+    "time": "2026-05-13 23:09:00:704",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.2s  ENC0:29667(-29667)  ENC1:-26641(-26641)  ENC2:    0(+0)  ENC3:17273(+17273)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684940912,
+    "time": "2026-05-13 23:09:00:912",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.4s  ENC0:-30633(+30633)  ENC1:-31410(-31410)  ENC2:    0(+0)  ENC3:20083(+20083)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684941123,
+    "time": "2026-05-13 23:09:01:123",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.6s  ENC0:-25371(+25371)  ENC1:29368(+29368)  ENC2:    0(+0)  ENC3:23078(+23078)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684941329,
+    "time": "2026-05-13 23:09:01:329",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.8s  ENC0:-20115(+20115)  ENC1:24597(+24597)  ENC2:    0(+0)  ENC3:25945(+25945)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684941537,
+    "time": "2026-05-13 23:09:01:537",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.0s  ENC0:-14861(+14861)  ENC1:19808(+19808)  ENC2:    0(+0)  ENC3:29052(+29052)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684941748,
+    "time": "2026-05-13 23:09:01:748",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.2s  ENC0:-9587(+9587)  ENC1:15027(+15027)  ENC2:    0(+0)  ENC3:31910(+31910)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684941955,
+    "time": "2026-05-13 23:09:01:955",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.4s  ENC0:-4321(+4321)  ENC1:10235(+10235)  ENC2:    0(+0)  ENC3:-30457(-30457)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684942165,
+    "time": "2026-05-13 23:09:02:165",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.6s  ENC0:  920(-920)  ENC1: 5429(+5429)  ENC2:    0(+0)  ENC3:-27588(-27588)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684942375,
+    "time": "2026-05-13 23:09:02:375",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.8s  ENC0: 6180(-6180)  ENC1:  631(+631)  ENC2:    0(+0)  ENC3:-24534(-24534)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684942580,
+    "time": "2026-05-13 23:09:02:580",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  3.0s  ENC0:11441(-11441)  ENC1:-4170(-4170)  ENC2:    0(+0)  ENC3:-21769(-21769)  GyroZ: +0.2\r\n----------------------------------------\r\n  Backward  STOP (1.5s)\r\n\r\n",
+    "timestamp": 1778684942796,
+    "time": "2026-05-13 23:09:02:796",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n========================================\r\n  Strafe Left  START\r\n  M0(RF):+30  M1(LF):-30  M2(RR):-30  M3(LR):+30\r\n========================================\r\n",
+    "timestamp": 1778684944311,
+    "time": "2026-05-13 23:09:04:311",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.2s  ENC0:-3584(+3584)  ENC1:-3435(-3435)  ENC2:    0(+0)  ENC3: 2386(+2386)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684944516,
+    "time": "2026-05-13 23:09:04:516",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.4s  ENC0:-8720(+8720)  ENC1:-8226(-8226)  ENC2:    0(+0)  ENC3: 5351(+5351)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684944725,
+    "time": "2026-05-13 23:09:04:725",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.6s  ENC0:-13906(+13906)  ENC1:-13065(-13065)  ENC2:    0(+0)  ENC3: 8549(+8549)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684944937,
+    "time": "2026-05-13 23:09:04:937",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.8s  ENC0:-19103(+19103)  ENC1:-17911(-17911)  ENC2:    0(+0)  ENC3:11611(+11611)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684945144,
+    "time": "2026-05-13 23:09:05:144",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.0s  ENC0:-24305(+24305)  ENC1:-22766(-22766)  ENC2:    0(+0)  ENC3:14803(+14803)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684945353,
+    "time": "2026-05-13 23:09:05:353",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.2s  ENC0:-29506(+29506)  ENC1:-27624(-27624)  ENC2:    0(+0)  ENC3:17701(+17701)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684945564,
+    "time": "2026-05-13 23:09:05:564",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.4s  ENC0:30818(-30818)  ENC1:-32471(-32471)  ENC2:    0(+0)  ENC3:20905(+20905)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684945769,
+    "time": "2026-05-13 23:09:05:769",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.6s  ENC0:25619(-25619)  ENC1:28215(+28215)  ENC2:    0(+0)  ENC3:23917(+23917)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684945980,
+    "time": "2026-05-13 23:09:05:980",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.8s  ENC0:20436(-20436)  ENC1:23359(+23359)  ENC2:    0(+0)  ENC3:27218(+27218)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684946185,
+    "time": "2026-05-13 23:09:06:185",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.0s  ENC0:15254(-15254)  ENC1:18492(+18492)  ENC2:    0(+0)  ENC3:30186(+30186)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684946395,
+    "time": "2026-05-13 23:09:06:395",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.2s  ENC0:10081(-10081)  ENC1:13621(+13621)  ENC2:    0(+0)  ENC3:-32224(-32224)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684946605,
+    "time": "2026-05-13 23:09:06:605",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.4s  ENC0: 4899(-4899)  ENC1: 8741(+8741)  ENC2:    0(+0)  ENC3:-29281(-29281)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684946807,
+    "time": "2026-05-13 23:09:06:807",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.6s  ENC0: -268(+268)  ENC1: 3865(+3865)  ENC2:    0(+0)  ENC3:-26029(-26029)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684947021,
+    "time": "2026-05-13 23:09:07:021",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.8s  ENC0:-5419(+5419)  ENC1:-1008(-1008)  ENC2:    0(+0)  ENC3:-23064(-23064)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684947226,
+    "time": "2026-05-13 23:09:07:226",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  3.0s  ENC0:-10574(+10574)  ENC1:-5888(-5888)  ENC2:    0(+0)  ENC3:-19862(-19862)  GyroZ: +0.2\r\n----------------------------------------\r\n  Strafe Left  STOP (1.5s)\r\n\r\n",
+    "timestamp": 1778684947446,
+    "time": "2026-05-13 23:09:07:446",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "\r\n========================================\r\n  Strafe Right  START\r\n  M0(RF):-30  M1(LF):+30  M2(RR):+30  M3(LR):-30\r\n========================================\r\n",
+    "timestamp": 1778684948957,
+    "time": "2026-05-13 23:09:08:957",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.2s  ENC0: 3612(-3612)  ENC1: 3301(+3301)  ENC2:    0(+0)  ENC3: 2323(+2323)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684949172,
+    "time": "2026-05-13 23:09:09:172",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.4s  ENC0: 8765(-8765)  ENC1: 7859(+7859)  ENC2:    0(+0)  ENC3: 5505(+5505)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684949377,
+    "time": "2026-05-13 23:09:09:377",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.6s  ENC0:13986(-13986)  ENC1:12471(+12471)  ENC2:    0(+0)  ENC3: 8556(+8556)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684949581,
+    "time": "2026-05-13 23:09:09:581",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  0.8s  ENC0:19218(-19218)  ENC1:17160(+17160)  ENC2:    0(+0)  ENC3:11851(+11851)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684949793,
+    "time": "2026-05-13 23:09:09:793",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.0s  ENC0:24430(-24430)  ENC1:21873(+21873)  ENC2:    0(+0)  ENC3:14904(+14904)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684950002,
+    "time": "2026-05-13 23:09:10:002",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.2s  ENC0:29656(-29656)  ENC1:26624(+26624)  ENC2:    0(+0)  ENC3:18024(+18024)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684950211,
+    "time": "2026-05-13 23:09:10:211",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.4s  ENC0:-30640(+30640)  ENC1:31385(+31385)  ENC2:    0(+0)  ENC3:21156(+21156)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684950419,
+    "time": "2026-05-13 23:09:10:419",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.6s  ENC0:-25398(+25398)  ENC1:-29376(-29376)  ENC2:    0(+0)  ENC3:24246(+24246)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684950622,
+    "time": "2026-05-13 23:09:10:622",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  1.8s  ENC0:-20134(+20134)  ENC1:-24577(-24577)  ENC2:    0(+0)  ENC3:27467(+27467)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684950835,
+    "time": "2026-05-13 23:09:10:835",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.0s  ENC0:-14915(+14915)  ENC1:-19786(-19786)  ENC2:    0(+0)  ENC3:30563(+30563)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684951046,
+    "time": "2026-05-13 23:09:11:046",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.2s  ENC0:-9659(+9659)  ENC1:-15004(-15004)  ENC2:    0(+0)  ENC3:-31825(-31825)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684951248,
+    "time": "2026-05-13 23:09:11:248",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.4s  ENC0:-4400(+4400)  ENC1:-10237(-10237)  ENC2:    0(+0)  ENC3:-28784(-28784)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684951462,
+    "time": "2026-05-13 23:09:11:462",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.6s  ENC0:  842(-842)  ENC1:-5459(-5459)  ENC2:    0(+0)  ENC3:-25455(-25455)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684951666,
+    "time": "2026-05-13 23:09:11:666",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  2.8s  ENC0: 6062(-6062)  ENC1: -682(-682)  ENC2:    0(+0)  ENC3:-22396(-22396)  GyroZ: +0.2\r\n",
+    "timestamp": 1778684951875,
+    "time": "2026-05-13 23:09:11:875",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "  3.0s  ENC0:11269(-11269)  ENC1: 4091(+4091)  ENC2:    0(+0)  ENC3:-19178(-19178)  GyroZ: +0.2\r\n----------------------------------------\r\n  Strafe Right  STOP (1.5s)\r\n\r\n",
+    "timestamp": 1778684952096,
+    "time": "2026-05-13 23:09:12:096",
+    "display": "ascii"
+  },
+  {
+    "type": "read",
+    "data": "========================================\r\n=== Stage 3 Complete ===\r\n========================================\r\n",
+    "timestamp": 1778684953606,
+    "time": "2026-05-13 23:09:13:606",
+    "display": "ascii"
+  }
+]
