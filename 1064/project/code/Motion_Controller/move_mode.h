@@ -1,5 +1,3 @@
-
-
 #ifndef MOVE_MODE_H
 #define MOVE_MODE_H
 
@@ -8,10 +6,10 @@
 // ==================================================== 距离移动配置参数 ====================================================
 
 /** @brief 前进/后退移动单位距离对应的编码器脉冲数 */
-#define MOVE_DISTANCE_FORWARD_PULSE     (2470)
+#define MOVE_DISTANCE_FORWARD_PULSE     (2960)
 
 /** @brief 左/右平移单位距离对应的编码器脉冲数 */
-#define MOVE_DISTANCE_STRAFE_PULSE      (2470)
+#define MOVE_DISTANCE_STRAFE_PULSE      (3664)
 
 /** @brief 默认移动速度（脉冲/秒） */
 #define MOVE_DEFAULT_SPEED              (5000.0f)
@@ -24,6 +22,19 @@
 
 /** @brief 位置 P 控制输出的最低速度（脉冲/秒），确保能克服摩擦力 */
 #define MOVE_POSITION_MIN_SPEED         (500.0f)
+
+/**
+ * @brief 平移时前后偏移修正增益
+ * @note 左/右平移时，如果车体向前或向后串动，根据 forward_pos 自动叠加反向 vx 分量
+ *       值越大修正越强，过大会抖动；建议从 0.3~1.0 调试
+ */
+#define MOVE_STRAFE_FORWARD_CORRECT_KP      (0.8f)
+
+/** @brief 平移前后偏移修正输出限幅（脉冲/秒） */
+#define MOVE_STRAFE_FORWARD_CORRECT_LIMIT   (1000.0f)
+
+/** @brief 平移前后偏移死区（脉冲），小误差不修正，避免低速抖动 */
+#define MOVE_STRAFE_FORWARD_DEADBAND        (10)
 
 #define MOVE_RUNPATH_DEFAULT_SPEED      (5000.0f)
 #define MOVE_RUNPATH_WAIT_DELAY_MS      (10)
@@ -65,12 +76,6 @@ void MoveMode_Init(void);
  * @brief 设置小车运动模式和速度
  * @param mode 运动模式（前进/后退/左移/右移/停止）
  * @param speed 目标速度，单位：脉冲/秒
- *              正值表示正向运动，负值表示反向运动
- * @note 示例：
- *       MoveMode_SetSpeed(FORWARD, 100.0f);     // 以 100 脉冲/秒前进
- *       MoveMode_SetSpeed(BACKWARD, 50.0f);     // 以 50 脉冲/秒后退
- *       MoveMode_SetSpeed(STRAFE_LEFT, 80.0f);  // 以 80 脉冲/秒左移
- *       MoveMode_SetSpeed(STOP, 0.0f);          // 停止
  */
 void MoveMode_SetSpeed(MoveMode_t mode, float speed);
 
@@ -108,9 +113,7 @@ void MoveMode_Stop(void);
 /**
  * @brief 控制小车前进指定距离
  * @param distance 移动距离（单位：格，1格 = 2470脉冲）
- * @param speed 移动速度，单位：脉冲/秒（默认可用 MOVE_DEFAULT_SPEED）
- * @note 此函数为异步调用，启动移动后立即返回
- *       需配合 MoveMode_IsFinished() 查询是否完成
+ * @param speed 移动速度，单位：脉冲/秒
  */
 void MoveMode_ForwardDistance(int32 distance, float speed);
 
@@ -148,18 +151,22 @@ uint8 MoveMode_IsFinished(void);
 MoveState_t MoveMode_GetState(void);
 
 /**
- * @brief 距离移动控制更新函数（需在 PIT 中断或主循环中周期性调用）
- * @note 此函数负责检查编码器位置并决定是否停止电机
- *       建议每 10~100ms 调用一次
+ * @brief 距离移动控制更新函数（需在主循环中周期性调用）
+ * @note 建议每 10~100ms 调用一次
  */
 void MoveMode_DistanceUpdate(void);
 
 /**
  * @brief 重置距离移动状态
- * @note 清除目标位置和当前状态，强制回到空闲状态
  */
 void MoveMode_ResetDistanceState(void);
 
+/**
+ * @brief 执行路径字符串
+ * @param path 路径字符串，W=前进，S=后退，A=左移，D=右移，1/2/3/4=观察点忽略
+ * @param speed 执行速度，单位：脉冲/秒
+ * @return uint8 1=成功，0=路径非法或执行失败
+ */
 uint8 MoveMode_RunPath(const char *path, float speed);
 
-#endif // MOVE_MODE_H
+#endif

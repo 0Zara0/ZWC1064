@@ -51,19 +51,19 @@ extern "C" {
 
 /* 磁力计默认校准参数，重新校准后可以把串口输出的四个宏复制到这里 */
 #ifndef IMU963_MAG_X_OFFSET_UT
-#define IMU963_MAG_X_OFFSET_UT               (-3.5546f)
+#define IMU963_MAG_X_OFFSET_UT               (801.2736f)
 #endif
 
 #ifndef IMU963_MAG_Y_OFFSET_UT
-#define IMU963_MAG_Y_OFFSET_UT               (82.6659f)
+#define IMU963_MAG_Y_OFFSET_UT               (-448.0362f)
 #endif
 
 #ifndef IMU963_MAG_X_SCALE
-#define IMU963_MAG_X_SCALE                   (1.0354f)
+#define IMU963_MAG_X_SCALE                   (1.1429f)
 #endif
 
 #ifndef IMU963_MAG_Y_SCALE
-#define IMU963_MAG_Y_SCALE                   (0.9669f)
+#define IMU963_MAG_Y_SCALE                   (0.8888f)
 #endif
 
 #ifndef IMU963_ANGLE_FILTER_ALPHA

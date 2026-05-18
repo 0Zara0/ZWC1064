@@ -1,11 +1,10 @@
-
-
 #include "move_mode.h"
 #include "motion_PID.h"
 #include "pid_algorithm.h"
 #include "zf_driver_delay.h"
 #include "zf_driver_encoder.h"
 #include <string.h>
+#include <stdlib.h>
 
 // 外部声明系统初始化标志
 extern uint8 g_system_initialized;
@@ -32,6 +31,65 @@ static int16 g_last_raw_count[ENCODER_COUNT] = {0};
 
 /** @brief 当前移动速度 */
 static float g_move_speed = 0.0f;
+
+// ==================================================== 内部工具函数 ====================================================
+
+static int32 MoveMode_AbsInt32(int32 value)
+{
+    return (value < 0) ? -value : value;
+}
+
+static float MoveMode_LimitFloat(float value, float min_value, float max_value)
+{
+    if (value > max_value)
+    {
+        return max_value;
+    }
+    if (value < min_value)
+    {
+        return min_value;
+    }
+    return value;
+}
+
+/**
+ * @brief 平移时加入前后偏移修正
+ * @param mode STRAFE_LEFT 或 STRAFE_RIGHT
+ * @param strafe_speed 平移速度，正值
+ * @param forward_pos 已累计的前后串动位置，正值=向前串，负值=向后串
+ */
+static void MoveMode_SetStrafeSpeedWithForwardCorrection(MoveMode_t mode, float strafe_speed, int32 forward_pos)
+{
+    float vy = 0.0f;
+    float vx_correction = 0.0f;
+
+    if (mode == STRAFE_LEFT)
+    {
+        vy = strafe_speed;
+    }
+    else if (mode == STRAFE_RIGHT)
+    {
+        vy = -strafe_speed;
+    }
+    else
+    {
+        return;
+    }
+
+    // forward_pos > 0 表示平移过程中向前串，需要叠加后退速度分量
+    // forward_pos < 0 表示向后串，需要叠加前进速度分量
+    if (MoveMode_AbsInt32(forward_pos) > MOVE_STRAFE_FORWARD_DEADBAND)
+    {
+        vx_correction = -MOVE_STRAFE_FORWARD_CORRECT_KP * (float)forward_pos;
+        vx_correction = MoveMode_LimitFloat(
+            vx_correction,
+            -MOVE_STRAFE_FORWARD_CORRECT_LIMIT,
+            MOVE_STRAFE_FORWARD_CORRECT_LIMIT
+        );
+    }
+
+    MotionPID_SetMecanumSpeed(vx_correction, vy);
+}
 
 // ==================================================== 基础运动控制函数 ====================================================
 
@@ -78,28 +136,23 @@ void MoveMode_SetSpeed(MoveMode_t mode, float speed)
     {
         case FORWARD:
             MotionPID_EnableHeadingHold();
-            MotionPID_SetAllMotorsSpeed(speed);
+            MotionPID_SetMecanumSpeed(speed, 0.0f);
             break;
 
         case BACKWARD:
             MotionPID_EnableHeadingHold();
-            MotionPID_SetAllMotorsSpeed(-speed);
+            MotionPID_SetMecanumSpeed(-speed, 0.0f);
             break;
 
         case STRAFE_LEFT:
-            MotionPID_DisableHeadingHold();
-            MotionPID_SetTargetSpeed(MOTOR_LEFT_FRONT, -speed);
-            MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR, -speed);
-            MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, speed);
-            MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR, speed);
+            // 平移也建议打开航向保持，避免车头角度变化造成斜走
+            MotionPID_EnableHeadingHold();
+            MotionPID_SetMecanumSpeed(0.0f, speed);
             break;
 
         case STRAFE_RIGHT:
-            MotionPID_DisableHeadingHold();
-            MotionPID_SetTargetSpeed(MOTOR_LEFT_FRONT, speed);
-            MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR, speed);
-            MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, -speed);
-            MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR, -speed);
+            MotionPID_EnableHeadingHold();
+            MotionPID_SetMecanumSpeed(0.0f, -speed);
             break;
 
         case STOP:
@@ -187,10 +240,12 @@ static void MoveMode_StartDistance(MoveMode_t mode, int32 distance, float speed)
         case BACKWARD:
             pulse_per_unit = MOVE_DISTANCE_FORWARD_PULSE;
             break;
+
         case STRAFE_LEFT:
         case STRAFE_RIGHT:
             pulse_per_unit = MOVE_DISTANCE_STRAFE_PULSE;
             break;
+
         default:
             return; // 无效模式
     }
@@ -211,12 +266,13 @@ static void MoveMode_StartDistance(MoveMode_t mode, int32 distance, float speed)
         // 反向移动：根据模式选择反向，并记录实际运动方向
         switch (mode)
         {
-            case FORWARD:    g_current_mode = BACKWARD;    break;
-            case BACKWARD:   g_current_mode = FORWARD;     break;
+            case FORWARD:      g_current_mode = BACKWARD;     break;
+            case BACKWARD:     g_current_mode = FORWARD;      break;
             case STRAFE_LEFT:  g_current_mode = STRAFE_RIGHT; break;
             case STRAFE_RIGHT: g_current_mode = STRAFE_LEFT;  break;
-            default:          g_current_mode = STOP;        break;
+            default:           g_current_mode = STOP;         break;
         }
+
         MoveMode_SetSpeed(g_current_mode, g_move_speed);
         g_target_pulse_count = -g_target_pulse_count; // 取绝对值
     }
@@ -311,11 +367,16 @@ void MoveMode_DistanceUpdate(void)
     for (uint8 i = 0; i < ENCODER_COUNT; i++)
     {
         int32 raw_delta = (int32)current_count[i] - (int32)g_last_raw_count[i];
+
         // 处理 int16 计数器溢出：超过阈值说明编码器发生了缠绕
         if (raw_delta > 32000)
+        {
             raw_delta -= 65536;
+        }
         else if (raw_delta < -32000)
+        {
             raw_delta += 65536;
+        }
 
         g_unwrapped_count[i] += raw_delta;
         g_last_raw_count[i] = current_count[i];
@@ -323,23 +384,31 @@ void MoveMode_DistanceUpdate(void)
         delta[i] = g_unwrapped_count[i];
     }
 
-    // 根据移动模式判断使用哪些电机作为参考
+    // 编码器方向归一化：
+    // 根据前进测试数据，RF(0)、RR(2) 原始编码器方向与期望前进方向相反
+    int32 p0 = -delta[MOTOR_RIGHT_FRONT];  // RF
+    int32 p1 =  delta[MOTOR_LEFT_FRONT];   // LF
+    int32 p2 = -delta[MOTOR_RIGHT_REAR];   // RR
+    int32 p3 =  delta[MOTOR_LEFT_REAR];    // LR
+
+    // 底盘位移分量估计
+    // forward_pos > 0 表示整体向前
+    // strafe_pos  > 0 表示整体向左
+    int32 forward_pos = (p0 + p1 + p2 + p3) / 4;
+    int32 strafe_pos  = (p0 - p1 - p2 + p3) / 4;
+
+    // 根据移动模式选择距离判定分量
     int32 avg_delta = 0;
     switch (g_current_mode)
     {
         case FORWARD:
         case BACKWARD:
-            // 前后移动：使用所有 4 个电机的平均值
-            avg_delta = (delta[0] + delta[1] + delta[2] + delta[3]) / 4;
+            avg_delta = MoveMode_AbsInt32(forward_pos);
             break;
 
         case STRAFE_LEFT:
         case STRAFE_RIGHT:
-            // 平移移动：麦克纳姆轮对角线电机同向
-            // 左平移：电机0和2反转，电机1和3正转
-            // 右平移：电机0和2正转，电机1和3反转
-            // 取电机0和2的平均（它们同向）
-            avg_delta = (abs(delta[0]) + abs(delta[2])) / 2;
+            avg_delta = MoveMode_AbsInt32(strafe_pos);
             break;
 
         default:
@@ -347,17 +416,34 @@ void MoveMode_DistanceUpdate(void)
             break;
     }
 
-    int32 remaining = g_target_pulse_count - abs(avg_delta);
-    if (remaining < 0) remaining = 0;
+    int32 remaining = g_target_pulse_count - avg_delta;
+    if (remaining < 0)
+    {
+        remaining = 0;
+    }
 
     if (remaining > MOVE_POSITION_TOLERANCE)
     {
         float dynamic_speed = MOVE_POSITION_KP * (float)remaining;
+
         if (dynamic_speed > g_move_speed)
+        {
             dynamic_speed = g_move_speed;
+        }
+
         if (dynamic_speed < MOVE_POSITION_MIN_SPEED)
+        {
             dynamic_speed = MOVE_POSITION_MIN_SPEED;
-        MoveMode_SetSpeed(g_current_mode, dynamic_speed);
+        }
+
+        if (g_current_mode == STRAFE_LEFT || g_current_mode == STRAFE_RIGHT)
+        {
+            MoveMode_SetStrafeSpeedWithForwardCorrection(g_current_mode, dynamic_speed, forward_pos);
+        }
+        else
+        {
+            MoveMode_SetSpeed(g_current_mode, dynamic_speed);
+        }
     }
     else
     {
@@ -386,9 +472,11 @@ static uint8 runpath_is_observe(char ch)
 
 static void runpath_wait_finish(void)
 {
-    while (1) {
+    while (1)
+    {
         MoveMode_DistanceUpdate();
-        if (MoveMode_IsFinished()) {
+        if (MoveMode_IsFinished())
+        {
             break;
         }
         system_delay_ms(MOVE_RUNPATH_WAIT_DELAY_MS);
@@ -397,16 +485,23 @@ static void runpath_wait_finish(void)
 
 static uint8 runpath_step(char dir, int32 count, float speed)
 {
-    switch (dir) {
-    case 'W': MoveMode_ForwardDistance(count, speed);     break;
-    case 'S': MoveMode_BackwardDistance(count, speed);    break;
-    case 'A': MoveMode_StrafeLeftDistance(count, speed);  break;
-    case 'D': MoveMode_StrafeRightDistance(count, speed); break;
-    default:  return 0;
+#if DEBUG_MOTOR_BYPASS
+    Debug_MotorBypass_LogPathStep(dir, count);
+    system_delay_ms(500);
+    return 1;
+#else
+    switch (dir)
+    {
+        case 'W': MoveMode_ForwardDistance(count, speed);     break;
+        case 'S': MoveMode_BackwardDistance(count, speed);    break;
+        case 'A': MoveMode_StrafeLeftDistance(count, speed);  break;
+        case 'D': MoveMode_StrafeRightDistance(count, speed); break;
+        default:  return 0;
     }
 
     runpath_wait_finish();
     return 1;
+#endif
 }
 
 uint8 MoveMode_RunPath(const char *path, float speed)
@@ -414,35 +509,42 @@ uint8 MoveMode_RunPath(const char *path, float speed)
     uint16 i;
     uint8 result;
 
-    if (path == NULL) {
+    if (path == NULL)
+    {
         return 0;
     }
 
-    if (speed <= 0.0f) {
+    if (speed <= 0.0f)
+    {
         speed = MOVE_RUNPATH_DEFAULT_SPEED;
     }
 
     i = 0;
     result = 1;
 
-    while (path[i] != '\0') {
+    while (path[i] != '\0')
+    {
         char ch = path[i];
 
-        if (runpath_is_observe(ch)) {
+        if (runpath_is_observe(ch))
+        {
             i++;
             continue;
         }
 
-        if (ch == 'W' || ch == 'S' || ch == 'A' || ch == 'D') {
+        if (ch == 'W' || ch == 'S' || ch == 'A' || ch == 'D')
+        {
             char dir = ch;
             int32 count = 1;
 
-            while (path[i + 1] == dir) {
+            while (path[i + 1] == dir)
+            {
                 count++;
                 i++;
             }
 
-            if (!runpath_step(dir, count, speed)) {
+            if (!runpath_step(dir, count, speed))
+            {
                 result = 0;
             }
         }

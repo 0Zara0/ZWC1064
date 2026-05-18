@@ -30,7 +30,7 @@
 /** @note 增大 Kp 可以加快响应速度，但过大会导致系统震荡 */
 /** @note Kp=0.35 时比例带仅 271pps，系统退化为 bang-bang 控制，PWM 在 ±100% 振荡 */
 /** @note Kp=0.06 时比例带约 1667pps，占 5000pps 工作范围的 33%，正常调节不饱和 */
-#define VELOCITY_PID_KP               (0.06f)
+#define VELOCITY_PID_KP               (0.025f)
 
 /** @brief 速度环 PID 积分系数 (Ki) */
 /** @note 增大 Ki 可以减小稳态误差，但过大会导致超调和震荡 */
@@ -42,7 +42,7 @@
 /** @note 增大 Kd 可以抑制震荡和超调，但过大会放大噪声 */
 /** @note 修正依据：原 Kd=0.002 与 dt=2ms 组合导致 Kd/dt=1.0，D项直接等于裸Δerror，引发剧烈振荡 */
 /** @note Kd=0.0002 使 Kd/dt=0.1，进一步衰减编码器跳变影响，抑制高频抖动 */
-#define VELOCITY_PID_KD               (0.0002f)
+#define VELOCITY_PID_KD               (0.00f)
 
 /** @brief D 项低通滤波系数 (alpha) */
 /** @note 对微分项 (Δerror/dt) 施加一阶低通滤波，抑制编码器噪声引起的 D 项尖峰 */
@@ -60,8 +60,8 @@
 #define VELOCITY_PID_INTEGRAL_MAX     (1000.0f)
 
 /** @brief 输出限幅值 (PWM 占空比百分比 -95~95, 预留 5% 给 H 桥自举电容充电) */
-#define VELOCITY_PID_OUTPUT_MAX       (95.0f)
-#define VELOCITY_PID_OUTPUT_MIN       (-95.0f)
+#define VELOCITY_PID_OUTPUT_MAX       (30.0f)
+#define VELOCITY_PID_OUTPUT_MIN       (-30.0f)
 
 // ==================================================== 数据结构定义 ==================================================
 
