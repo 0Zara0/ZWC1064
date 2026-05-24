@@ -71,6 +71,7 @@ extern uint8 g_system_initialized;
 
 extern uint8 g_heading_hold_enabled;
 extern float g_heading_target;
+extern float g_heading_target_rate;
 
 // ==================================================== 传感器、电机、定时器初始化 ====================================================
 
@@ -120,5 +121,6 @@ float MotionPID_GetActualSpeed(uint8 motor_index);
 void MotionPID_InitHeadingHold(void);
 void MotionPID_EnableHeadingHold(void);
 void MotionPID_DisableHeadingHold(void);
+void MotionPID_UpdateHeadingControl(float dt);
 
 #endif

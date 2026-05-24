@@ -28,9 +28,9 @@
 
 /** @brief 速度环 PID 比例系数 (Kp) */
 /** @note 增大 Kp 可以加快响应速度，但过大会导致系统震荡 */
-/** @note Kp=0.35 时比例带仅 271pps，系统退化为 bang-bang 控制，PWM 在 ±100% 振荡 */
 /** @note Kp=0.06 时比例带约 1667pps，占 5000pps 工作范围的 33%，正常调节不饱和 */
-#define VELOCITY_PID_KP               (0.025f)
+/** @note 30pps 角速度环修正时 P 项贡献 1.8%PWM，配合 I 项快速越过 3% 死区 */
+#define VELOCITY_PID_KP               (0.06f)
 
 /** @brief 速度环 PID 积分系数 (Ki) */
 /** @note 增大 Ki 可以减小稳态误差，但过大会导致超调和震荡 */
@@ -108,16 +108,15 @@ typedef struct
 
 // ==================================================== 角度环 PID 配置参数 ========================================
 
-#define ANGLE_PID_KP                    (2.0f)
-#define ANGLE_PID_KI                    (0.1f)
-#define ANGLE_PID_KD                    (0.5f)
-#define ANGLE_PID_OUTPUT_LIMIT          (50.0f)
-#define ANGLE_PID_INTEGRAL_LIMIT        (200.0f)
+#define ANGLE_PID_KP                    (10.0f)
+#define ANGLE_PID_KI                    (4.0f)
+#define ANGLE_PID_OUTPUT_LIMIT          (1000.0f)
+#define ANGLE_PID_INTEGRAL_LIMIT        (5000.0f)
 
 typedef struct
 {
-    float Kp, Ki, Kd;
-    float error, error_last, error_sum;
+    float Kp, Ki;
+    float error, error_sum;
     float output;
     float target_angle, current_angle;
     float output_limit;
@@ -215,8 +214,34 @@ void VelocityPID_Reset(uint8 pid_index);
  */
 void VelocityPID_ExecuteMotorControl(uint8 pid_index, DCMotor *motor);
 
-void AnglePID_Init(AnglePIDController_t *pid, float Kp, float Ki, float Kd, float output_limit, float integral_limit);
+void AnglePID_Init(AnglePIDController_t *pid, float Kp, float Ki, float output_limit, float integral_limit);
 float AnglePID_Calculate(AnglePIDController_t *pid, float target_angle, float current_angle, float dt);
 void AnglePID_Reset(AnglePIDController_t *pid);
+
+/* ============================== 角速度环 PID 配置 ============================== */
+
+#define ANGULAR_RATE_PID_KP                    (3.0f)
+#define ANGULAR_RATE_PID_KI                    (0.5f)
+#define ANGULAR_RATE_PID_KD                    (0.1f)
+#define ANGULAR_RATE_PID_OUTPUT_LIMIT          (30.0f)
+#define ANGULAR_RATE_PID_INTEGRAL_LIMIT        (100.0f)
+
+typedef struct
+{
+    float Kp, Ki, Kd;
+    float error, error_last, error_sum;
+    float output;
+    float target_rate;
+    float current_rate;
+    float output_limit;
+    float integral_limit;
+    uint8 initialized, enabled;
+} AngularRatePIDController_t;
+
+extern AngularRatePIDController_t g_angular_rate_pid;
+
+void AngularRatePID_Init(AngularRatePIDController_t *pid, float Kp, float Ki, float Kd, float output_limit, float integral_limit);
+float AngularRatePID_Calculate(AngularRatePIDController_t *pid, float target_rate, float current_rate, float dt);
+void AngularRatePID_Reset(AngularRatePIDController_t *pid);
 
 #endif //PID_ALGORITHM_H

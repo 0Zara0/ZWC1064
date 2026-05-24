@@ -16,9 +16,6 @@ VelocityPIDController_t g_velocity_pid_controller[ENCODER_COUNT] = {0};
 /** @brief 角度环 PID 控制器 */
 AnglePIDController_t g_angle_pid_controller = {0};
 
-/** @brief 角度 PID 微分项低通滤波器状态 */
-static float g_angle_pid_derivative_filtered = 0.0f;
-
 // ==================================================== 静态函数声明 ================================================
 
 /**
@@ -382,13 +379,11 @@ void VelocityPID_ExecuteMotorControl(uint8 pid_index, DCMotor *motor)
 }
 
 
-void AnglePID_Init(AnglePIDController_t *pid, float Kp, float Ki, float Kd, float output_limit, float integral_limit)
+void AnglePID_Init(AnglePIDController_t *pid, float Kp, float Ki, float output_limit, float integral_limit)
 {
     pid->Kp = Kp;
     pid->Ki = Ki;
-    pid->Kd = Kd;
     pid->error = 0.0f;
-    pid->error_last = 0.0f;
     pid->error_sum = 0.0f;
     pid->output = 0.0f;
     pid->target_angle = 0.0f;
@@ -416,31 +411,17 @@ float AnglePID_Calculate(AnglePIDController_t *pid, float target_angle, float cu
     pid->error = error;
 
     pid->error_sum += error * dt;
-
     if (pid->error_sum > pid->integral_limit)
         pid->error_sum = pid->integral_limit;
     else if (pid->error_sum < -pid->integral_limit)
         pid->error_sum = -pid->integral_limit;
 
-    float error_derivative;
-    if (dt > 0.0001f)
-        error_derivative = (error - pid->error_last) / dt;
-    else
-        error_derivative = 0.0f;
-
-    const float alpha = 0.1f;
-    g_angle_pid_derivative_filtered = g_angle_pid_derivative_filtered * (1.0f - alpha) + error_derivative * alpha;
-
-    pid->output = pid->Kp * error
-                + pid->Ki * pid->error_sum
-                + pid->Kd * g_angle_pid_derivative_filtered;
+    pid->output = pid->Kp * error + pid->Ki * pid->error_sum;
 
     if (pid->output > pid->output_limit)
         pid->output = pid->output_limit;
     else if (pid->output < -pid->output_limit)
         pid->output = -pid->output_limit;
-
-    pid->error_last = error;
 
     return pid->output;
 }
@@ -448,9 +429,67 @@ float AnglePID_Calculate(AnglePIDController_t *pid, float target_angle, float cu
 void AnglePID_Reset(AnglePIDController_t *pid)
 {
     pid->error = 0.0f;
+    pid->error_sum = 0.0f;
+    pid->output = 0.0f;
+    pid->enabled = 0;
+}
+
+/* ============================== 角速度环 PID ============================== */
+
+AngularRatePIDController_t g_angular_rate_pid = {0};
+
+void AngularRatePID_Init(AngularRatePIDController_t *pid, float Kp, float Ki, float Kd, float output_limit, float integral_limit)
+{
+    pid->Kp = Kp;
+    pid->Ki = Ki;
+    pid->Kd = Kd;
+    pid->error = 0.0f;
+    pid->error_last = 0.0f;
+    pid->error_sum = 0.0f;
+    pid->output = 0.0f;
+    pid->target_rate = 0.0f;
+    pid->current_rate = 0.0f;
+    pid->output_limit = output_limit;
+    pid->integral_limit = integral_limit;
+    pid->initialized = 1;
+    pid->enabled = 0;
+}
+
+float AngularRatePID_Calculate(AngularRatePIDController_t *pid, float target_rate, float current_rate, float dt)
+{
+    if (!pid->initialized)
+        return 0.0f;
+
+    pid->target_rate = target_rate;
+    pid->current_rate = current_rate;
+
+    pid->error = target_rate - current_rate;
+
+    pid->error_sum += pid->error * dt;
+    if (pid->error_sum > pid->integral_limit)
+        pid->error_sum = pid->integral_limit;
+    else if (pid->error_sum < -pid->integral_limit)
+        pid->error_sum = -pid->integral_limit;
+
+    pid->output = pid->Kp * pid->error
+                + pid->Ki * pid->error_sum
+                + pid->Kd * (pid->error - pid->error_last);
+
+    if (pid->output > pid->output_limit)
+        pid->output = pid->output_limit;
+    else if (pid->output < -pid->output_limit)
+        pid->output = -pid->output_limit;
+
+    pid->error_last = pid->error;
+
+    return pid->output;
+}
+
+void AngularRatePID_Reset(AngularRatePIDController_t *pid)
+{
+    pid->error = 0.0f;
     pid->error_last = 0.0f;
     pid->error_sum = 0.0f;
     pid->output = 0.0f;
     pid->enabled = 0;
-    g_angle_pid_derivative_filtered = 0.0f;
 }
