@@ -2,7 +2,7 @@
 #include "zf_driver_delay.h"
 #include "zf_driver_pit.h"
 #include "pid_algorithm.h"
-
+#include "imu963.h"
 // ==================================================== 全局变量定义 ====================================================
 
 /** @brief 全局传感器数据结构体，存储所有传感器采集的数据 */
@@ -20,8 +20,8 @@ uint8 g_heading_hold_enabled = 0;
 /** @brief 航向保持的目标偏航角（单位：度，0~360） */
 float g_heading_target = 0.0f;
 
-/** @brief 上一次角度PID修正量缓存（用于IMU未更新周期时保持输出） */
-static float g_heading_last_correction = 0.0f;
+/** @brief 角度环输出的目标角速度，供角速度环消费（单位：°/s） */
+float g_heading_target_rate = 0.0f;
 
 // ==================================================== 编码器配置 ====================================================
 // 正交编码器与 MCU 引脚的硬件连接定义
@@ -230,29 +230,14 @@ void pit_handler(void)
 
     float angle_correction = 0.0f;
 
-    if (g_heading_hold_enabled)
+    if (g_heading_hold_enabled && g_angular_rate_pid.enabled)
     {
-        static uint8 imu_divider = 0;
-        imu_divider++;
-
-        // IMU 角度环 10ms 计算一次，2ms 周期内复用上一次修正量
-        if (imu_divider >= 5)
-        {
-            imu_divider = 0;
-
-            float current_angle = imu963_get_angle();
-            angle_correction = AnglePID_Calculate(
-                &g_angle_pid_controller,
-                g_heading_target,
-                current_angle,
-                0.010f
-            );
-            g_heading_last_correction = angle_correction;
-        }
-        else
-        {
-            angle_correction = g_heading_last_correction;
-        }
+        angle_correction = AngularRatePID_Calculate(
+            &g_angular_rate_pid,
+            g_heading_target_rate,
+            g_sensor_data.gyro_z,
+            SENSOR_UPDATE_PERIOD_MS / 1000.0f
+        );
     }
 
     for (uint8 i = 0; i < ENCODER_COUNT; i++)
@@ -317,33 +302,33 @@ void MotionPID_SetMecanumSpeed(float vx, float vy)
 {
 		if(vy>1.0f)//向左
 		{
-    MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, (vx + vy)*STRAFE_COMPENSATION_GAIN_LEFT*0.997*0.7);
-    MotionPID_SetTargetSpeed(MOTOR_LEFT_FRONT,  (vx - vy)*0.997*0.78*0.9);
-    MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR,  (vx - vy)*1.003*0.78*1.1);
-    MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR,   (vx + vy)*STRAFE_COMPENSATION_GAIN_LEFT*1.003*1.1);
+    MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, (vx + vy));
+    MotionPID_SetTargetSpeed(MOTOR_LEFT_FRONT,  (vx - vy));
+    MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR,  (vx - vy));
+    MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR,   (vx + vy));
 		}
 		
 		else if(vy<-1.0f)//向右
 		{
-    MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, (vx + vy)*STRAFE_COMPENSATION_GAIN_RIGHT*1.012);
-    MotionPID_SetTargetSpeed(MOTOR_LEFT_FRONT,  (vx - vy)*0.9*1.012);
-    MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR,  (vx - vy)*0.9*0.988);
-    MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR,   (vx + vy)*STRAFE_COMPENSATION_GAIN_RIGHT*0.988);
+    MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, (vx + vy));
+    MotionPID_SetTargetSpeed(MOTOR_LEFT_FRONT,  (vx - vy));
+    MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR,  (vx - vy));
+    MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR,   (vx + vy));
 		}
 		
 		else if(vy==0)
 		{
-		MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, (vx + vy)*0.98);
+		MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, (vx + vy));
     MotionPID_SetTargetSpeed(MOTOR_LEFT_FRONT,  vx - vy);
-    MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR,  (vx - vy)*0.98);
+    MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR,  (vx - vy));
     MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR,   vx + vy);
 		}
 		else
 		{
-    MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, (vx + vy)*STRAFE_COMPENSATION_GAIN_LEFT*0.98);
+    MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, (vx + vy));
     MotionPID_SetTargetSpeed(MOTOR_LEFT_FRONT,  (vx - vy));
-    MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR,  (vx - vy)*0.98);
-    MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR,   (vx + vy)*STRAFE_COMPENSATION_GAIN_LEFT);
+    MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR,  (vx - vy));
+    MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR,   (vx + vy));
 		}
 }
 
@@ -375,14 +360,22 @@ void MotionPID_InitHeadingHold(void)
         &g_angle_pid_controller,
         ANGLE_PID_KP,
         ANGLE_PID_KI,
-        ANGLE_PID_KD,
         ANGLE_PID_OUTPUT_LIMIT,
         ANGLE_PID_INTEGRAL_LIMIT
     );
 
+    AngularRatePID_Init(
+        &g_angular_rate_pid,
+        ANGULAR_RATE_PID_KP,
+        ANGULAR_RATE_PID_KI,
+        ANGULAR_RATE_PID_KD,
+        ANGULAR_RATE_PID_OUTPUT_LIMIT,
+        ANGULAR_RATE_PID_INTEGRAL_LIMIT
+    );
+
     g_heading_hold_enabled = 0;
     g_heading_target = 0.0f;
-    g_heading_last_correction = 0.0f;
+    g_heading_target_rate = 0.0f;
 }
 
 /**
@@ -402,9 +395,11 @@ void MotionPID_EnableHeadingHold(void)
         float current_angle = imu963_get_angle();
 
         g_heading_target = current_angle;
+        g_heading_target_rate = 0.0f;
         AnglePID_Reset(&g_angle_pid_controller);
         g_angle_pid_controller.enabled = 1;
-        g_heading_last_correction = 0.0f;
+        AngularRatePID_Reset(&g_angular_rate_pid);
+        g_angular_rate_pid.enabled = 1;
     }
 
     g_heading_hold_enabled = 1;
@@ -415,5 +410,23 @@ void MotionPID_DisableHeadingHold(void)
     g_heading_hold_enabled = 0;
     AnglePID_Reset(&g_angle_pid_controller);
     g_angle_pid_controller.enabled = 0;
-    g_heading_last_correction = 0.0f;
+    AngularRatePID_Reset(&g_angular_rate_pid);
+    g_angular_rate_pid.enabled = 0;
+}
+
+void MotionPID_UpdateHeadingControl(float dt)
+{
+    if (!g_heading_hold_enabled)
+        return;
+    if (!imu963_data.initialized)
+        return;
+
+    float current_angle = imu963_get_angle();
+
+    g_heading_target_rate = AnglePID_Calculate(
+        &g_angle_pid_controller,
+        g_heading_target,
+        current_angle,
+        dt
+    );
 }

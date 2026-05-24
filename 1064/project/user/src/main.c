@@ -162,11 +162,8 @@ int main(void)
     debug_init();
 		//imu963_init_with_calibration(300u,100u);
 		imu963_init();
-	uart_init(UART_4,115200, UART4_TX_C16, UART4_RX_C17);
+//	uart_init(UART_4,115200, UART4_TX_C16, UART4_RX_C17);
     system_delay_ms(50);
-//	while(1)
-//	uart_query_byte (UART_4,dat);
-//	OMV_TriggerAndReceive(s_omv_buffer, OMV_MAP_TOTAL);
 #if MAIN_DEBUG
     printf("   Motion Control Test System - Stage %d\r\n", DEBUG_STAGE);
 #else
@@ -527,7 +524,7 @@ int main(void)
             printf("  Time     ENC_avg  Speed_RF  Speed_LF  Speed_RR  Speed_LR\r\n");
             printf("  ----     -------  --------  --------  --------  --------\r\n");
 
-            MoveMode_ForwardDistance(0, MOVE_DEFAULT_SPEED);
+            MoveMode_ForwardDistance(10, MOVE_DEFAULT_SPEED);
             uint32 t = 0;
             while (!MoveMode_IsFinished())
             {
@@ -550,11 +547,35 @@ int main(void)
             printf("  --- Forward done ---\r\n");
             system_delay_ms(500);
 
+					 MoveMode_BackwardDistance(0, MOVE_DEFAULT_SPEED);
+            t = 0;
+            while (!MoveMode_IsFinished())
+            {
+                system_delay_ms(10);
+                MoveMode_DistanceUpdate();
+                t++;
+								float raw;
+                raw = EncoderSpeedCalc_GetFilteredSpeed(0); float s0 = raw < 0 ? -raw : raw;
+                raw = EncoderSpeedCalc_GetFilteredSpeed(1); float s1 = raw < 0 ? -raw : raw;
+                raw = EncoderSpeedCalc_GetFilteredSpeed(2); float s2 = raw < 0 ? -raw : raw;
+                raw = EncoderSpeedCalc_GetFilteredSpeed(3); float s3 = raw < 0 ? -raw : raw;
+                float avg_enc = (s0 + s1 + s2 + s3) / 4.0f;
+                printf("  %4.1fs    %5.0f    %+6.0f     %+6.0f     %+6.0f     %+6.0f\r\n",
+                       t * 0.1f, avg_enc,
+                       EncoderSpeedCalc_GetFilteredSpeed(0),
+                       EncoderSpeedCalc_GetFilteredSpeed(1),
+                       EncoderSpeedCalc_GetFilteredSpeed(2),
+                       EncoderSpeedCalc_GetFilteredSpeed(3));
+            }
+            printf("  --- StrafeLeft done ---\r\n");
+            system_delay_ms(500);
+
+						
             printf("\r\n--- Cycle %d: StrafeLeft 1 cell ---\r\n", cycle + 1);
             printf("  Time     ENC_avg  Speed_RF  Speed_LF  Speed_RR  Speed_LR\r\n");
             printf("  ----     -------  --------  --------  --------  --------\r\n");
 
-            MoveMode_StrafeLeftDistance(10, MOVE_DEFAULT_SPEED);
+            MoveMode_StrafeLeftDistance(0, MOVE_DEFAULT_SPEED);
             t = 0;
             while (!MoveMode_IsFinished())
             {

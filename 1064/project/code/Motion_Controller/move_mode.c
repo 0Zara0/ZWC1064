@@ -355,6 +355,8 @@ void MoveMode_DistanceUpdate(void)
         return;
     }
 
+    MotionPID_UpdateHeadingControl(0.010f);
+
     // 读取当前编码器值
     int16 current_count[ENCODER_COUNT];
     current_count[0] = encoder_get_count(QTIMER1_ENCODER1);

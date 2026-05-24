@@ -18,12 +18,12 @@ static float imu963_dt = (IMU963_SAMPLE_PERIOD_MS / 1000.0f);
 
 static float imu963_q_bias = 0.0f;
 static float imu963_q_angle = 0.001f;
-static float imu963_q_gyro = 0.003f;
-static float imu963_r_angle = 0.01f;
-static float imu963_p[2][2] = {{1.0f, 1.0f}, {1.0f, 1.0f}};
+static float imu963_q_gyro = 0.001f;
+static float imu963_r_angle = 0.08f;
+static float imu963_p[2][2] = {{1.0f, 0.0f}, {0.0f, 1.0f}};
 static uint8 imu963_kalman_valid = 0;
-static uint8 imu963_output_filter_valid = 0;
-static float imu963_filtered_angle = 0.0f;
+static float imu963_mag_ref_magnitude = 0.0f;
+static uint16 imu963_residual_count = 0u;
 
 /* 运行时磁力计校准参数。普通初始化时来自 imu963.h 中的四个宏；校准后会被新参数覆盖。 */
 static float imu963_mag_x_offset = IMU963_MAG_X_OFFSET_UT;
@@ -154,12 +154,10 @@ void imu963_reset_filter(float angle_deg)
     imu963_data.angle_deg = imu963_normalize_360(angle_deg);
     imu963_q_bias = 0.0f;
     imu963_p[0][0] = 1.0f;
-    imu963_p[0][1] = 1.0f;
-    imu963_p[1][0] = 1.0f;
+    imu963_p[0][1] = 0.0f;
+    imu963_p[1][0] = 0.0f;
     imu963_p[1][1] = 1.0f;
     imu963_kalman_valid = 1u;
-    imu963_filtered_angle = imu963_data.angle_deg;
-    imu963_output_filter_valid = 1u;
 }
 
 void imu963_update_raw(void)
@@ -216,26 +214,49 @@ void imu963_update(void)
 
 float imu963_get_yaw_mag(void)
 {
-    float x_raw_corr;
-    float y_raw_corr;
+    float mag_x_corr;
+    float mag_y_corr;
+    float mag_z_corr;
     float x_cal;
     float y_cal;
+    float z_cal;
+    float pitch_rad;
+    float roll_rad;
+    float cos_pitch;
+    float sin_pitch;
+    float cos_roll;
+    float sin_roll;
+    float mag_x_horiz;
+    float mag_y_horiz;
     float yaw_rad;
 
-    x_raw_corr = imu963_data.mag_x - imu963_mag_x_offset;
-    y_raw_corr = imu963_data.mag_y - imu963_mag_y_offset;
+    mag_x_corr = imu963_data.mag_x - imu963_mag_x_offset;
+    mag_y_corr = imu963_data.mag_y - imu963_mag_y_offset;
+    mag_z_corr = imu963_data.mag_z;
 
-    x_cal = x_raw_corr * imu963_mag_x_scale;
-    y_cal = y_raw_corr * imu963_mag_y_scale;
+    x_cal = mag_x_corr * imu963_mag_x_scale;
+    y_cal = mag_y_corr * imu963_mag_y_scale;
+    z_cal = mag_z_corr;
 
-    yaw_rad = atan2f(y_cal, x_cal);
+    pitch_rad = asinf(-imu963_data.acc_x);
+    roll_rad  = asinf(imu963_data.acc_y);
+
+    cos_pitch = cosf(pitch_rad);
+    sin_pitch = sinf(pitch_rad);
+    cos_roll  = cosf(roll_rad);
+    sin_roll  = sinf(roll_rad);
+
+    mag_x_horiz = x_cal * cos_pitch + z_cal * sin_pitch;
+    mag_y_horiz = x_cal * sin_roll * sin_pitch + y_cal * cos_roll - z_cal * sin_roll * cos_pitch;
+
+    yaw_rad = atan2f(-mag_y_horiz, mag_x_horiz);
     imu963_data.yaw_deg = yaw_rad * 180.0f / IMU963_PI;
     imu963_data.yaw_deg = imu963_normalize_360(imu963_data.yaw_deg);
 
     return imu963_data.yaw_deg;
 }
 
-static float imu963_kalman_filter(float new_angle_deg, float new_gyro_dps)
+static float imu963_kalman_filter(float mag_yaw, float gyro_z)
 {
     float s;
     float k0;
@@ -243,43 +264,79 @@ static float imu963_kalman_filter(float new_angle_deg, float new_gyro_dps)
     float angle_error;
     float p00_temp;
     float p01_temp;
+    float mag_mag2;
+    uint8 mag_ok;
 
     if(!imu963_kalman_valid)
     {
-        imu963_reset_filter(new_angle_deg);
+        imu963_reset_filter(mag_yaw);
     }
 
-    imu963_data.angle_deg = imu963_data.angle_deg - imu963_q_bias * imu963_dt + new_gyro_dps * imu963_dt;
+    imu963_data.angle_deg += (gyro_z - imu963_q_bias) * imu963_dt;
 
-    imu963_p[0][0] = imu963_p[0][0] + imu963_q_angle - (imu963_p[0][1] + imu963_p[1][0]) * imu963_dt;
-    imu963_p[0][1] = imu963_p[0][1] - imu963_p[1][1] * imu963_dt;
-    imu963_p[1][0] = imu963_p[1][0] - imu963_p[1][1] * imu963_dt;
-    imu963_p[1][1] = imu963_p[1][1] + imu963_q_gyro;
+    imu963_p[0][0] += imu963_q_angle - (imu963_p[0][1] + imu963_p[1][0]) * imu963_dt;
+    imu963_p[0][1] -= imu963_p[1][1] * imu963_dt;
+    imu963_p[1][0] -= imu963_p[1][1] * imu963_dt;
+    imu963_p[1][1] += imu963_q_gyro;
 
-    s = imu963_p[0][0] + imu963_r_angle;
-    k0 = imu963_p[0][0] / s;
-    k1 = imu963_p[1][0] / s;
+    mag_mag2 = imu963_data.mag_x * imu963_data.mag_x
+             + imu963_data.mag_y * imu963_data.mag_y
+             + imu963_data.mag_z * imu963_data.mag_z;
 
-    angle_error = new_angle_deg - imu963_data.angle_deg;
-    if(angle_error > 180.0f)
+    if(imu963_mag_ref_magnitude > 1e-6f)
     {
-        angle_error -= 360.0f;
+        float dev = IMU963_MAG_REF_DEVIATION;
+        float lo = imu963_mag_ref_magnitude * imu963_mag_ref_magnitude * (1.0f - dev) * (1.0f - dev);
+        float hi = imu963_mag_ref_magnitude * imu963_mag_ref_magnitude * (1.0f + dev) * (1.0f + dev);
+        mag_ok = (mag_mag2 > lo) && (mag_mag2 < hi);
     }
-    else if(angle_error < -180.0f)
+    else
     {
-        angle_error += 360.0f;
+        mag_ok = 1u;
     }
 
-    imu963_data.angle_deg = imu963_data.angle_deg + k0 * angle_error;
-    imu963_q_bias = imu963_q_bias + k1 * angle_error;
+    if(mag_ok)
+    {
+        s = imu963_p[0][0] + imu963_r_angle;
+        k0 = imu963_p[0][0] / s;
+        k1 = imu963_p[1][0] / s;
 
-    p00_temp = imu963_p[0][0];
-    p01_temp = imu963_p[0][1];
+        angle_error = mag_yaw - imu963_data.angle_deg;
+        if(angle_error > 180.0f)
+        {
+            angle_error -= 360.0f;
+        }
+        else if(angle_error < -180.0f)
+        {
+            angle_error += 360.0f;
+        }
 
-    imu963_p[0][0] = imu963_p[0][0] - k0 * p00_temp;
-    imu963_p[0][1] = imu963_p[0][1] - k0 * p01_temp;
-    imu963_p[1][0] = imu963_p[1][0] - k1 * p00_temp;
-    imu963_p[1][1] = imu963_p[1][1] - k1 * p01_temp;
+        if(fabsf(angle_error) > IMU963_KALMAN_RESIDUAL_THRESHOLD_DEG)
+        {
+            imu963_residual_count++;
+            if(imu963_residual_count > IMU963_KALMAN_RESIDUAL_MAX_COUNT)
+            {
+                imu963_reset_filter(mag_yaw);
+                imu963_residual_count = 0u;
+                return imu963_data.angle_deg;
+            }
+        }
+        else
+        {
+            if(imu963_residual_count > 0u) imu963_residual_count--;
+        }
+
+        imu963_data.angle_deg += k0 * angle_error;
+        imu963_q_bias += k1 * angle_error;
+
+        p00_temp = imu963_p[0][0];
+        p01_temp = imu963_p[0][1];
+
+        imu963_p[0][0] -= k0 * p00_temp;
+        imu963_p[0][1] -= k0 * p01_temp;
+        imu963_p[1][0] -= k1 * p00_temp;
+        imu963_p[1][1] -= k1 * p01_temp;
+    }
 
     imu963_data.angle_deg = imu963_normalize_360(imu963_data.angle_deg);
     return imu963_data.angle_deg;
@@ -287,37 +344,13 @@ static float imu963_kalman_filter(float new_angle_deg, float new_gyro_dps)
 
 float imu963_get_angle(void)
 {
-    float raw;
-    float delta;
-
     imu963_update();
     imu963_get_yaw_mag();
     imu963_kalman_filter(imu963_data.yaw_deg, imu963_data.gyro_z);
 
-    if(imu963_data.angle_deg < imu963_data.yaw_bias_deg)
-    {
-        imu963_data.angle_deg = imu963_data.yaw_bias_deg - imu963_data.angle_deg;
-    }
-    else
-    {
-        imu963_data.angle_deg = 360.0f - (imu963_data.angle_deg - imu963_data.yaw_bias_deg);
-    }
+    imu963_data.angle_deg = imu963_shortest_angle_delta(imu963_data.angle_deg, imu963_data.yaw_bias_deg);
+    imu963_data.angle_deg = imu963_normalize_360(imu963_data.angle_deg);
 
-    raw = imu963_normalize_360(imu963_data.angle_deg);
-
-    if(!imu963_output_filter_valid)
-    {
-        imu963_filtered_angle = raw;
-        imu963_output_filter_valid = 1u;
-    }
-    else
-    {
-        delta = imu963_shortest_angle_delta(raw, imu963_filtered_angle);
-        imu963_filtered_angle = imu963_filtered_angle + delta * (1.0f - IMU963_ANGLE_FILTER_ALPHA);
-        imu963_filtered_angle = imu963_normalize_360(imu963_filtered_angle);
-    }
-
-    imu963_data.angle_deg = imu963_filtered_angle;
     return imu963_data.angle_deg;
 }
 
@@ -452,6 +485,10 @@ uint8 imu963_keep_angle(void)
     imu963_data.acc_x_bias = accx_sum / (float)IMU963_KEEP_SAMPLE_COUNT;
     imu963_data.acc_y_bias = accy_sum / (float)IMU963_KEEP_SAMPLE_COUNT;
 
+    imu963_mag_ref_magnitude = sqrtf(imu963_data.mag_x * imu963_data.mag_x
+                                   + imu963_data.mag_y * imu963_data.mag_y
+                                   + imu963_data.mag_z * imu963_data.mag_z);
+
     imu963_reset_filter(imu963_data.yaw_bias_deg);
     return 0u;
 }
@@ -463,9 +500,9 @@ static uint8 imu963_base_start(void)
     memset(&imu963_data, 0, sizeof(imu963_data));
     imu963_data.initialized = 0u;
     imu963_kalman_valid = 0u;
-    imu963_output_filter_valid = 0u;
-    imu963_filtered_angle = 0.0f;
     imu963_q_bias = 0.0f;
+    imu963_mag_ref_magnitude = 0.0f;
+    imu963_residual_count = 0u;
     imu963_load_default_mag_calibration();
 
     state = imu963ra_init();

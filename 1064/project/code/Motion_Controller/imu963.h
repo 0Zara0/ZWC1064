@@ -51,23 +51,19 @@ extern "C" {
 
 /* 磁力计默认校准参数，重新校准后可以把串口输出的四个宏复制到这里 */
 #ifndef IMU963_MAG_X_OFFSET_UT
-#define IMU963_MAG_X_OFFSET_UT               (801.2736f)
+#define IMU963_MAG_X_OFFSET_UT               (-3.5546f)
 #endif
 
 #ifndef IMU963_MAG_Y_OFFSET_UT
-#define IMU963_MAG_Y_OFFSET_UT               (-448.0362f)
+#define IMU963_MAG_Y_OFFSET_UT               (82.6659f)
 #endif
 
 #ifndef IMU963_MAG_X_SCALE
-#define IMU963_MAG_X_SCALE                   (1.1429f)
+#define IMU963_MAG_X_SCALE                   (1.0354f)
 #endif
 
 #ifndef IMU963_MAG_Y_SCALE
-#define IMU963_MAG_Y_SCALE                   (0.8888f)
-#endif
-
-#ifndef IMU963_ANGLE_FILTER_ALPHA
-#define IMU963_ANGLE_FILTER_ALPHA            (0.7f)      /* 输出角度一阶滤波系数 */
+#define IMU963_MAG_Y_SCALE                   (0.9669f)
 #endif
 
 #ifndef IMU963_KEEP_SAMPLE_COUNT
@@ -118,6 +114,20 @@ extern "C" {
 
 #ifndef IMU963_CALIB_PRINT_ENABLE
 #define IMU963_CALIB_PRINT_ENABLE            (1u)        /* 一体化校准后是否自动打印四个参数 */
+#endif
+
+/* ============================== Kalman 可靠性参数 ============================== */
+
+#ifndef IMU963_MAG_REF_DEVIATION
+#define IMU963_MAG_REF_DEVIATION             (0.5f)      /* 磁场模量相对参考值的允许偏差比例，0.5=±50% */
+#endif
+
+#ifndef IMU963_KALMAN_RESIDUAL_THRESHOLD_DEG
+#define IMU963_KALMAN_RESIDUAL_THRESHOLD_DEG (30.0f)     /* Kalman 残差阈值，超此值累计一次异常 */
+#endif
+
+#ifndef IMU963_KALMAN_RESIDUAL_MAX_COUNT
+#define IMU963_KALMAN_RESIDUAL_MAX_COUNT     (8u)        /* 连续异常次数达此值时自动重置滤波器 */
 #endif
 
 /* ============================== 数据结构定义 ============================== */
