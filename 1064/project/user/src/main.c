@@ -174,10 +174,10 @@ int main(void)
     MotionPID_Sensor_Init();
     printf("    IMU + Encoder initialized\r\n");
 
-    encoder_clear_count(QTIMER1_ENCODER1);
-    encoder_clear_count(QTIMER1_ENCODER2);
     encoder_clear_count(QTIMER2_ENCODER1);
+    encoder_clear_count(QTIMER1_ENCODER2);
     encoder_clear_count(QTIMER2_ENCODER2);
+    encoder_clear_count(QTIMER1_ENCODER1);
     printf("    Encoders cleared\r\n");
 
 #if MAIN_DEBUG && DEBUG_STAGE >= 2
@@ -210,7 +210,7 @@ int main(void)
         printf("   === Stage 1: Sensor Check (Encoder + IMU) ===\r\n");
         printf("========================================\r\n");
         printf("   [Motor]  All stopped (no PWM output)\r\n");
-        printf("   [Encoder] Turn each wheel manually, observe count + dir\r\n");
+        printf("   [Encoder] Turn each wheel manually, observe raw count + dir\r\n");
         printf("   [IMU]     Rotate chassis, observe Yaw angle + GyroZ\r\n");
         printf("========================================\r\n\r\n");
         printf("   T(s)     ENC_RF      ENC_LF      ENC_RR      ENC_LR      IMU_Yaw     IMU_GyroZ\r\n");
@@ -222,10 +222,10 @@ int main(void)
             tick++;
             if (tick % 4 == 0)
             {
-                int32 e0 = -encoder_get_count(QTIMER1_ENCODER1);
-                int32 e1 =  encoder_get_count(QTIMER1_ENCODER2);
-                int32 e2 = -encoder_get_count(QTIMER2_ENCODER1);
-                int32 e3 =  encoder_get_count(QTIMER2_ENCODER2);
+                int32 e0 = encoder_get_count(QTIMER2_ENCODER1);
+                int32 e1 = encoder_get_count(QTIMER1_ENCODER2);
+                int32 e2 = encoder_get_count(QTIMER2_ENCODER2);
+                int32 e3 = encoder_get_count(QTIMER1_ENCODER1);
                 float yaw   = imu963_get_angle();
                 float gyroZ = imu963_data.gyro_z;
 
@@ -248,10 +248,9 @@ int main(void)
 #elif DEBUG_STAGE == 2
     {
         const encoder_index_enum enc_ch[4] = {
-            QTIMER1_ENCODER1, QTIMER1_ENCODER2,
-            QTIMER2_ENCODER1, QTIMER2_ENCODER2
+            QTIMER2_ENCODER1, QTIMER1_ENCODER2,
+            QTIMER2_ENCODER2, QTIMER1_ENCODER1
         };
-        const int32 enc_sign[4] = { -1, 1, -1, 1 };  // ENC0/2 reversed vs motor forward
         const char *mot_name[4] = { "RF", "LF", "RR", "LR" };
 
         printf("\r\n========================================\r\n");
@@ -259,44 +258,44 @@ int main(void)
         printf("========================================\r\n");
         printf("   Each motor: +20%% PWM 2s -> stop 1s -> -20%% 2s -> stop 1s\r\n");
         printf("   Expect: +PWM forward, encoder count increases\r\n");
-        printf("   Display: raw ENC + signed ENC (ENC0/2 reversed)\r\n");
+        printf("   Display: raw ENC only (no sign correction)\r\n");
         printf("========================================\r\n");
 
         for (int m = 0; m < 4; m++)
         {
             printf("\r\n-------- Motor %d (%s) +20%% PWM --------\r\n", m, mot_name[m]);
-            printf("  Time    ENC_raw  ENC_signed\r\n");
-            printf("  ----    -------  ----------\r\n");
+            printf("  Time    ENC_raw\r\n");
+            printf("  ----    -------\r\n");
             encoder_clear_count(enc_ch[m]);
             DCMotor_SetSpeed(&g_motor_controller.motor[m], 20.0f);
             for (int t = 0; t < 10; t++)
             {
                 system_delay_ms(200);
                 int32 raw = encoder_get_count(enc_ch[m]);
-                printf("  %4.1fs   %5d     %5d\r\n",
-                       (t + 1) * 0.2f, raw, raw * enc_sign[m]);
+                printf("  %4.1fs   %5d\r\n",
+                       (t + 1) * 0.2f, raw);
             }
             DCMotor_SetSpeed(&g_motor_controller.motor[m], 0.0f);
             system_delay_ms(1000);
 
             printf("\r\n-------- Motor %d (%s) -20%% PWM --------\r\n", m, mot_name[m]);
-            printf("  Time    ENC_raw  ENC_signed\r\n");
-            printf("  ----    -------  ----------\r\n");
+            printf("  Time    ENC_raw\r\n");
+            printf("  ----    -------\r\n");
             encoder_clear_count(enc_ch[m]);
             DCMotor_SetSpeed(&g_motor_controller.motor[m], -20.0f);
             for (int t = 0; t < 10; t++)
             {
                 system_delay_ms(200);
                 int32 raw = encoder_get_count(enc_ch[m]);
-                printf("  %4.1fs   %5d     %5d\r\n",
-                       (t + 1) * 0.2f, raw, raw * enc_sign[m]);
+                printf("  %4.1fs   %5d\r\n",
+                       (t + 1) * 0.2f, raw);
             }
             DCMotor_SetSpeed(&g_motor_controller.motor[m], 0.0f);
             system_delay_ms(1000);
         }
 
         printf("\r\n=== Stage 2 Complete ===\r\n");
-        printf("Verify: +PWM -> ENC_signed positive for all 4 motors\r\n");
+        printf("Verify: +PWM -> note ENC direction for each motor\r\n");
         while (1) { system_delay_ms(1000); }
     }
 
@@ -304,10 +303,9 @@ int main(void)
 #elif DEBUG_STAGE == 3
     {
         const encoder_index_enum enc_ch[4] = {
-            QTIMER1_ENCODER1, QTIMER1_ENCODER2,
-            QTIMER2_ENCODER1, QTIMER2_ENCODER2
+            QTIMER2_ENCODER1, QTIMER1_ENCODER2,
+            QTIMER2_ENCODER2, QTIMER1_ENCODER1
         };
-        const int32 enc_sign[4] = { -1, 1, -1, 1 };
         const char *mode_name[] = { "Forward", "Backward", "Strafe Left", "Strafe Right" };
 
         printf("\r\n========================================\r\n");
@@ -347,12 +345,9 @@ int main(void)
                 int32 e2 = encoder_get_count(enc_ch[2]);
                 int32 e3 = encoder_get_count(enc_ch[3]);
 
-                printf("  %.1fs  ENC0:%5d(%+d)  ENC1:%5d(%+d)  ENC2:%5d(%+d)  ENC3:%5d(%+d)  GyroZ:%+5.1f\r\n",
+                printf("  %.1fs  ENC0:%5d  ENC1:%5d  ENC2:%5d  ENC3:%5d  GyroZ:%+5.1f\r\n",
                        (t + 1) * 0.2f,
-                       e0, e0 * enc_sign[0],
-                       e1, e1 * enc_sign[1],
-                       e2, e2 * enc_sign[2],
-                       e3, e3 * enc_sign[3],
+                       e0, e1, e2, e3,
                        imu963_data.gyro_z);
             }
 
@@ -398,7 +393,7 @@ int main(void)
             for (int t = 0; t < 30; t++)
             {
                 system_delay_ms(100);
-                float actual = EncoderSpeedCalc_GetFilteredSpeed(m);
+                float actual = MotionPID_GetActualSpeed(m);
 
                 printf("  %4.1fs   %5.0f     %5.0f    %+5.0f   %+6.1f   %+6.1f   %+4.0f\r\n",
                        t * 0.1f,

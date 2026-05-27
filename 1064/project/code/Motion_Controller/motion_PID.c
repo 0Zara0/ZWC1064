@@ -25,35 +25,36 @@ float g_heading_target_rate = 0.0f;
 
 // ==================================================== 编码器配置 ====================================================
 // 正交编码器与 MCU 引脚的硬件连接定义
-// 编码器 1 连接到 QTIMER1_ENCODER1 通道，使用 GPIO 引脚 C0 和 C1
-// 编码器 2 连接到 QTIMER1_ENCODER2 通道，使用 GPIO 引脚 C2 和 C24
-// 编码器 3 连接到 QTIMER2_ENCODER1 通道，使用 GPIO 引脚 C3 和 C4
-// 编码器 4 连接到 QTIMER2_ENCODER2 通道，使用 GPIO 引脚 C5 和 C25
+// ENC0(RF) → QTIMER2_ENCODER1, C3/C4
+// ENC1(LF) → QTIMER1_ENCODER2, C2/C24
+// ENC2(RR) → QTIMER2_ENCODER2, C5/C25
+// ENC3(LR) → QTIMER1_ENCODER1, C0/C1
 
-#define ENCODER1_CH1_PIN    QTIMER1_ENCODER1_CH1_C0
-#define ENCODER1_CH2_PIN    QTIMER1_ENCODER1_CH2_C1
-#define ENCODER2_CH1_PIN    QTIMER1_ENCODER2_CH1_C2
-#define ENCODER2_CH2_PIN    QTIMER1_ENCODER2_CH2_C24
-#define ENCODER3_CH1_PIN    QTIMER2_ENCODER1_CH1_C3
-#define ENCODER3_CH2_PIN    QTIMER2_ENCODER1_CH2_C4
-#define ENCODER4_CH1_PIN    QTIMER2_ENCODER2_CH1_C5
-#define ENCODER4_CH2_PIN    QTIMER2_ENCODER2_CH2_C25
+#define ENCODER0_CH1_PIN    QTIMER2_ENCODER1_CH1_C3
+#define ENCODER0_CH2_PIN    QTIMER2_ENCODER1_CH2_C4
+#define ENCODER1_CH1_PIN    QTIMER1_ENCODER2_CH1_C2
+#define ENCODER1_CH2_PIN    QTIMER1_ENCODER2_CH2_C24
+#define ENCODER2_CH1_PIN    QTIMER2_ENCODER2_CH1_C5
+#define ENCODER2_CH2_PIN    QTIMER2_ENCODER2_CH2_C25
+#define ENCODER3_CH1_PIN    QTIMER1_ENCODER1_CH1_C0
+#define ENCODER3_CH2_PIN    QTIMER1_ENCODER1_CH2_C1
 
 // ==================================================== 电机配置 ======================================================
 // 直流电机与 MCU 引脚的硬件连接定义
-// 电机 1 方向控制引脚为 C7，PWM 输出通道为 PWM2_MODULE0_CHA_C6
-// 电机 2 方向控制引脚为 C9，PWM 输出通道为 PWM2_MODULE1_CHA_C8
-// 电机 3 方向控制引脚为 C11，PWM 输出通道为 PWM2_MODULE2_CHA_C10
-// 电机 4 方向控制引脚为 D3，PWM 输出通道为 PWM2_MODULE3_CHA_D2
+// 电机方向：RF(0)和RR(2)方向取反，LF(1)和LR(3)不取反（根据实际接线测试确认）
+// MOTOR0(RF): DIR=C11, PWM=PWM2_MODULE2_CHA_C10
+// MOTOR1(LF): DIR=D3, PWM=PWM2_MODULE3_CHA_D2
+// MOTOR2(RR): DIR=C9, PWM=PWM2_MODULE1_CHA_C8
+// MOTOR3(LR): DIR=C7, PWM=PWM2_MODULE0_CHA_C6
 
-#define MOTOR1_DIR_PIN      C7
-#define MOTOR1_PWM_CH       PWM2_MODULE0_CHA_C6
+#define MOTOR0_DIR_PIN      C11
+#define MOTOR0_PWM_CH       PWM2_MODULE2_CHA_C10
+#define MOTOR1_DIR_PIN      D3
+#define MOTOR1_PWM_CH       PWM2_MODULE3_CHA_D2
 #define MOTOR2_DIR_PIN      C9
 #define MOTOR2_PWM_CH       PWM2_MODULE1_CHA_C8
-#define MOTOR3_DIR_PIN      C11
-#define MOTOR3_PWM_CH       PWM2_MODULE2_CHA_C10
-#define MOTOR4_DIR_PIN      D3
-#define MOTOR4_PWM_CH       PWM2_MODULE3_CHA_D2
+#define MOTOR3_DIR_PIN      C7
+#define MOTOR3_PWM_CH       PWM2_MODULE0_CHA_C6
 
 #define MOTOR_PWM_FREQ      17000   // PWM 信号工作频率设置为 17kHz
 
@@ -71,10 +72,10 @@ static uint32 g_timer_last_count = 0;
  */
 void MotionPID_Encoder_Init(void)
 {
-    encoder_quad_init(QTIMER1_ENCODER1, ENCODER1_CH1_PIN, ENCODER1_CH2_PIN);
-    encoder_quad_init(QTIMER1_ENCODER2, ENCODER2_CH1_PIN, ENCODER2_CH2_PIN);
-    encoder_quad_init(QTIMER2_ENCODER1, ENCODER3_CH1_PIN, ENCODER3_CH2_PIN);
-    encoder_quad_init(QTIMER2_ENCODER2, ENCODER4_CH1_PIN, ENCODER4_CH2_PIN);
+    encoder_quad_init(QTIMER2_ENCODER1, ENCODER0_CH1_PIN, ENCODER0_CH2_PIN);
+    encoder_quad_init(QTIMER1_ENCODER2, ENCODER1_CH1_PIN, ENCODER1_CH2_PIN);
+    encoder_quad_init(QTIMER2_ENCODER2, ENCODER2_CH1_PIN, ENCODER2_CH2_PIN);
+    encoder_quad_init(QTIMER1_ENCODER1, ENCODER3_CH1_PIN, ENCODER3_CH2_PIN);
 }
 
 /**
@@ -115,10 +116,10 @@ void MotionPID_Sensor_Init(void)
  */
 void MotionPID_ReadEncoderData(void)
 {
-    g_sensor_data.encoder_speed[0] = encoder_get_count(QTIMER1_ENCODER1);
+    g_sensor_data.encoder_speed[0] = encoder_get_count(QTIMER2_ENCODER1);
     g_sensor_data.encoder_speed[1] = encoder_get_count(QTIMER1_ENCODER2);
-    g_sensor_data.encoder_speed[2] = encoder_get_count(QTIMER2_ENCODER1);
-    g_sensor_data.encoder_speed[3] = encoder_get_count(QTIMER2_ENCODER2);
+    g_sensor_data.encoder_speed[2] = encoder_get_count(QTIMER2_ENCODER2);
+    g_sensor_data.encoder_speed[3] = encoder_get_count(QTIMER1_ENCODER1);
 }
 
 /**
@@ -171,15 +172,15 @@ void MotionPID_Motor_Init(void)
         return;
     }
 
-    DCMotor_Init(&g_motor_controller.motor[0], MOTOR1_DIR_PIN, MOTOR1_PWM_CH, MOTOR_PWM_FREQ);
-    g_motor_controller.motor[0].dir_inverted = 1;  // RF 原始方向反
+    DCMotor_Init(&g_motor_controller.motor[0], MOTOR0_DIR_PIN, MOTOR0_PWM_CH, MOTOR_PWM_FREQ);
+    g_motor_controller.motor[0].dir_inverted = 1;
 
-    DCMotor_Init(&g_motor_controller.motor[1], MOTOR2_DIR_PIN, MOTOR2_PWM_CH, MOTOR_PWM_FREQ);
+    DCMotor_Init(&g_motor_controller.motor[1], MOTOR1_DIR_PIN, MOTOR1_PWM_CH, MOTOR_PWM_FREQ);
 
-    DCMotor_Init(&g_motor_controller.motor[2], MOTOR3_DIR_PIN, MOTOR3_PWM_CH, MOTOR_PWM_FREQ);
-    g_motor_controller.motor[2].dir_inverted = 1;  // RR 原始方向反
+    DCMotor_Init(&g_motor_controller.motor[2], MOTOR2_DIR_PIN, MOTOR2_PWM_CH, MOTOR_PWM_FREQ);
+    g_motor_controller.motor[2].dir_inverted = 1;
 
-    DCMotor_Init(&g_motor_controller.motor[3], MOTOR4_DIR_PIN, MOTOR4_PWM_CH, MOTOR_PWM_FREQ);
+    DCMotor_Init(&g_motor_controller.motor[3], MOTOR3_DIR_PIN, MOTOR3_PWM_CH, MOTOR_PWM_FREQ);
 
     for (uint8 i = 0; i < ENCODER_COUNT; i++)
     {

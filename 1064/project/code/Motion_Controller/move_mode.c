@@ -222,10 +222,10 @@ void MoveMode_Stop(void)
 static void MoveMode_StartDistance(MoveMode_t mode, int32 distance, float speed)
 {
     // 记录当前编码器位置作为基准
-    g_start_encoder_count[0] = encoder_get_count(QTIMER1_ENCODER1);
+    g_start_encoder_count[0] = encoder_get_count(QTIMER2_ENCODER1);
     g_start_encoder_count[1] = encoder_get_count(QTIMER1_ENCODER2);
-    g_start_encoder_count[2] = encoder_get_count(QTIMER2_ENCODER1);
-    g_start_encoder_count[3] = encoder_get_count(QTIMER2_ENCODER2);
+    g_start_encoder_count[2] = encoder_get_count(QTIMER2_ENCODER2);
+    g_start_encoder_count[3] = encoder_get_count(QTIMER1_ENCODER1);
 
     for (uint8 i = 0; i < ENCODER_COUNT; i++)
     {
@@ -359,10 +359,10 @@ void MoveMode_DistanceUpdate(void)
 
     // 读取当前编码器值
     int16 current_count[ENCODER_COUNT];
-    current_count[0] = encoder_get_count(QTIMER1_ENCODER1);
+    current_count[0] = encoder_get_count(QTIMER2_ENCODER1);
     current_count[1] = encoder_get_count(QTIMER1_ENCODER2);
-    current_count[2] = encoder_get_count(QTIMER2_ENCODER1);
-    current_count[3] = encoder_get_count(QTIMER2_ENCODER2);
+    current_count[2] = encoder_get_count(QTIMER2_ENCODER2);
+    current_count[3] = encoder_get_count(QTIMER1_ENCODER1);
 
     // 计算各电机已移动的脉冲数（增量累积，处理 int16 溢出）
     int32 delta[ENCODER_COUNT];
@@ -386,12 +386,11 @@ void MoveMode_DistanceUpdate(void)
         delta[i] = g_unwrapped_count[i];
     }
 
-    // 编码器方向归一化：
-    // 根据前进测试数据，RF(0)、RR(2) 原始编码器方向与期望前进方向相反
-    int32 p0 = -delta[MOTOR_RIGHT_FRONT];  // RF
-    int32 p1 =  delta[MOTOR_LEFT_FRONT];   // LF
-    int32 p2 = -delta[MOTOR_RIGHT_REAR];   // RR
-    int32 p3 =  delta[MOTOR_LEFT_REAR];    // LR
+    // 编码器方向归一化：统一使用 dir_inverted 标志修正
+    int32 p0 = g_motor_controller.motor[MOTOR_RIGHT_FRONT].dir_inverted ? -delta[MOTOR_RIGHT_FRONT] : delta[MOTOR_RIGHT_FRONT];
+    int32 p1 = g_motor_controller.motor[MOTOR_LEFT_FRONT ].dir_inverted ? -delta[MOTOR_LEFT_FRONT]  : delta[MOTOR_LEFT_FRONT];
+    int32 p2 = g_motor_controller.motor[MOTOR_RIGHT_REAR ].dir_inverted ? -delta[MOTOR_RIGHT_REAR]  : delta[MOTOR_RIGHT_REAR];
+    int32 p3 = g_motor_controller.motor[MOTOR_LEFT_REAR  ].dir_inverted ? -delta[MOTOR_LEFT_REAR]   : delta[MOTOR_LEFT_REAR];
 
     // 底盘位移分量估计
     // forward_pos > 0 表示整体向前
