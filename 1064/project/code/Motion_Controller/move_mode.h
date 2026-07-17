@@ -3,13 +3,45 @@
 
 #include "zf_common_typedef.h"
 
+// ==================================================== 底盘物理尺寸参数 ====================================================
+
+/** @brief 前后轴距 (mm) — 前后轮轴线间的距离 */
+#define CHASSIS_WHEELBASE_MM            (186.0f)
+
+/** @brief 左右轮距 (mm) — 左右轮接地中心间的距离 */
+#define CHASSIS_TRACK_WIDTH_MM          (183.0f)
+
+/** @brief 麦克纳姆轮直径 (mm) */
+#define CHASSIS_WHEEL_DIAMETER_MM       (52.0f)
+
+/** @brief 半轴距 Lx = 前后轴距 / 2 (mm)，用于运动学模型 */
+#define CHASSIS_HALF_WHEELBASE_MM       (CHASSIS_WHEELBASE_MM / 2.0f)
+
+/** @brief 半轮距 Ly = 左右轮距 / 2 (mm)，用于运动学模型 */
+#define CHASSIS_HALF_TRACK_WIDTH_MM     (CHASSIS_TRACK_WIDTH_MM / 2.0f)
+
+/** @brief 轮子半径 R (mm) */
+#define CHASSIS_WHEEL_RADIUS_MM         (CHASSIS_WHEEL_DIAMETER_MM / 2.0f)
+
+/** @brief 编码器每圈脉冲数 (PPR) */
+#define ENCODER_PULSES_PER_REV          (2367)
+
 // ==================================================== 距离移动配置参数 ====================================================
 
-/** @brief 前进/后退移动单位距离对应的编码器脉冲数 */
-#define MOVE_DISTANCE_FORWARD_PULSE     (2960)
+/** @brief 前进/后退移动200mm的理论脉冲数
+ *  @note 计算: 200 / (π×52) × 2367 ≈ 2898
+ *  @note 上次经验值: 2898 */
+#define MOVE_DISTANCE_FORWARD_PULSE     (3018)
 
-/** @brief 左/右平移单位距离对应的编码器脉冲数 */
-#define MOVE_DISTANCE_STRAFE_PULSE      (3664)
+/** @brief 左/右平移移动200mm的理论脉冲数
+ *  @note 计算: 同前向 ≈ 2898（麦轮平移滑动大，理论值仅供参考）
+ *  @note 上次经验值: 3492 */
+#define MOVE_DISTANCE_STRAFE_PULSE      (3470)
+
+/** @brief 原地左/右转向90°的理论脉冲数
+ *  @note 计算: (Lx+Ly) / (2×D) × PPR = 184.5 / 104 × 2367 ≈ 4200
+ *  @note 上次经验值: 4200 */
+#define MOVE_DISTANCE_TURN_QUARTER_PULSE (4395)
 
 /** @brief 默认移动速度（脉冲/秒） */
 #define MOVE_DEFAULT_SPEED              (5000.0f)
@@ -36,7 +68,8 @@
 /** @brief 平移前后偏移死区（脉冲），小误差不修正，避免低速抖动 */
 #define MOVE_STRAFE_FORWARD_DEADBAND        (10)
 
-#define MOVE_RUNPATH_DEFAULT_SPEED      (5000.0f)
+/** @brief 路径执行默认速度（脉冲/秒），统一使用 MOVE_DEFAULT_SPEED */
+#define MOVE_RUNPATH_DEFAULT_SPEED      MOVE_DEFAULT_SPEED
 #define MOVE_RUNPATH_WAIT_DELAY_MS      (10)
 
 // ==================================================== 运动模式枚举与状态 ====================================================
@@ -50,7 +83,9 @@ typedef enum
     FORWARD,            // 前进
     BACKWARD,           // 后退
     STRAFE_LEFT,        // 左平移
-    STRAFE_RIGHT        // 右平移
+    STRAFE_RIGHT,       // 右平移
+    TURN_LEFT,          // 原地左转（CCW）
+    TURN_RIGHT          // 原地右转（CW）
 } MoveMode_t;
 
 /**
@@ -160,6 +195,28 @@ void MoveMode_DistanceUpdate(void);
  * @brief 重置距离移动状态
  */
 void MoveMode_ResetDistanceState(void);
+
+/**
+ * @brief 原地左转指定角度（CCW，逆时针）
+ * @param quarter_turns 转向角度（单位：1/4 周 = 90°，正数 CCW，负数 CW）
+ * @param speed 转向速度，单位：脉冲/秒
+ * @note 左侧两轮向后，右侧两轮向前，航向保持自动禁用
+ */
+void MoveMode_TurnLeftDistance(int32 quarter_turns, float speed);
+
+/**
+ * @brief 原地右转指定角度（CW，顺时针）
+ * @param quarter_turns 转向角度（单位：1/4 周 = 90°，正数 CW，负数 CCW）
+ * @param speed 转向速度，单位：脉冲/秒
+ * @note 右侧两轮向后，左侧两轮向前，航向保持自动禁用
+ */
+void MoveMode_TurnRightDistance(int32 quarter_turns, float speed);
+
+/**
+ * @brief 原地 180° 后转
+ * @param speed 转向速度，单位：脉冲/秒
+ */
+void MoveMode_TurnBack(float speed);
 
 /**
  * @brief 执行路径字符串

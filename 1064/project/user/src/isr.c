@@ -57,6 +57,8 @@ void PIT_IRQHandler(void)
     if(pit_flag_get(PIT_CH1))
     {
         pit_flag_clear(PIT_CH1);
+        extern void imu_timer_handler(void);
+        imu_timer_handler();
     }
     
     if(pit_flag_get(PIT_CH2))

@@ -15,8 +15,8 @@
 
 /** @brief 编码器低通滤波系数 (alpha = dt / (RC + dt)) */
 /** @note alpha 越小滤波效果越强，但响应越慢；alpha 越大响应越快，但滤波效果弱 */
-/** @note 2ms周期: α=0.04 → τ≈50ms（滤波强度高于原5ms/α=0.2，有效抑制编码器单脉冲噪声） */
-#define ENCODER_FILTER_ALPHA          (0.04f)
+/** @note 1ms周期: α=0.02 → τ≈50ms，与 2ms/α=0.04 保持相同滤波强度 */
+#define ENCODER_FILTER_ALPHA          (0.02f)
 
 /** @brief 编码器脉冲数溢出阈值 (用于处理 16 位计数器溢出) */
 #define ENCODER_COUNT_OVERFLOW_THRESHOLD  (32000)
@@ -40,13 +40,13 @@
 
 /** @brief 速度环 PID 微分系数 (Kd) */
 /** @note 增大 Kd 可以抑制震荡和超调，但过大会放大噪声 */
-/** @note 修正依据：原 Kd=0.002 与 dt=2ms 组合导致 Kd/dt=1.0，D项直接等于裸Δerror，引发剧烈振荡 */
-/** @note Kd=0.0002 使 Kd/dt=0.1，进一步衰减编码器跳变影响，抑制高频抖动 */
+/** @note 修正依据：原 Kd=0.002 与 dt=1ms 组合导致 Kd/dt=2.0，D项直接等于裸Δerror，引发剧烈振荡 */
+/** @note Kd=0.0002 使 Kd/dt=0.2，进一步衰减编码器跳变影响，抑制高频抖动 */
 #define VELOCITY_PID_KD               (0.00f)
 
 /** @brief D 项低通滤波系数 (alpha) */
 /** @note 对微分项 (Δerror/dt) 施加一阶低通滤波，抑制编码器噪声引起的 D 项尖峰 */
-/** @note alpha=0.1 在 2ms 周期下对应时间常数约 20ms，平衡滤波效果和响应速度 */
+/** @note alpha=0.1 在 1ms 周期下对应时间常数约 10ms，平衡滤波效果和响应速度 */
 #define VELOCITY_PID_D_FILTER_ALPHA   (0.1f)
 
 /** @brief 积分分离阈值 */

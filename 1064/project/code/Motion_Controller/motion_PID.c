@@ -23,6 +23,9 @@ float g_heading_target = 0.0f;
 /** @brief 角度环输出的目标角速度，供角速度环消费（单位：°/s） */
 float g_heading_target_rate = 0.0f;
 
+/** @brief 上一次 pit_handler 计算的航向修正量，供 MoveMode_DistanceUpdate 恢复（单位：脉冲/秒） */
+static float g_heading_correction_result = 0.0f;
+
 // ==================================================== 编码器配置 ====================================================
 // 正交编码器与 MCU 引脚的硬件连接定义
 // ENC0(RF) → QTIMER2_ENCODER1, C3/C4
@@ -123,8 +126,8 @@ void MotionPID_ReadEncoderData(void)
 }
 
 /**
- * @brief 读取 IMU963RA 九轴传感器数据（从 imu963_data 全局结构体读取物理值）
- * @note imu963_data 由 imu963_get_angle() 内部的 imu963_update() 定期刷新
+ * @brief 读取 IMU963RA 六轴传感器数据（从 imu963_data 全局结构体读取物理值，磁力计已禁用）
+ * @note imu963_data 由 imu_timer_handler (PIT_CH1) 每 1ms 调用 imu963_get_angle() 定期刷新
  */
 void MotionPID_ReadIMUData(void)
 {
@@ -135,10 +138,6 @@ void MotionPID_ReadIMUData(void)
     g_sensor_data.gyro_x = imu963_data.gyro_x;
     g_sensor_data.gyro_y = imu963_data.gyro_y;
     g_sensor_data.gyro_z = imu963_data.gyro_z;
-
-    g_sensor_data.mag_x = imu963_data.mag_x;
-    g_sensor_data.mag_y = imu963_data.mag_y;
-    g_sensor_data.mag_z = imu963_data.mag_z;
 
     g_sensor_data.yaw = imu963_data.angle_deg;
 }
@@ -221,15 +220,49 @@ void MotionPID_ResetTimer(void)
 }
 
 /**
- * @brief PIT 定时器中断服务回调函数
- * @note 该函数由 isr.c 中的 PIT_IRQHandler 每 2ms 自动调用一次
- *       执行传感器数据采集、速度解算、PID 控制和电机驱动等实时任务
+ * @brief 初始化 IMU 专用 PIT 定时器（独立于电机控制中断）
+ * @note 使用 PIT_CH1，周期 1ms，由 isr.c 中的 PIT_IRQHandler 调用 imu_timer_handler
+ */
+void MotionPID_IMU_Timer_Init(void)
+{
+    pit_ms_init(IMU_TIMER_CH, SENSOR_UPDATE_PERIOD_MS);
+    pit_enable(IMU_TIMER_CH);
+    pit_flag_clear(IMU_TIMER_CH);
+    imu963_set_dt_ms((float)SENSOR_UPDATE_PERIOD_MS);
+}
+
+/**
+ * @brief IMU 定时器中断服务回调函数
+ * @note 由 isr.c 中的 PIT_IRQHandler(PIT_CH1) 每 1ms 调用一次
+ *       读取九轴传感器原始数据、计算磁力计偏航角、执行 Kalman 融合滤波
+ *       完成后同步更新 g_sensor_data，供 pit_handler 消费
+ */
+void imu_timer_handler(void)
+{
+    imu963_get_angle();
+    MotionPID_ReadIMUData();
+}
+
+/**
+ * @brief PIT 定时器中断服务回调函数（1kHz 级联 PID 控制）
+ * @note 该函数由 isr.c 中的 PIT_IRQHandler(PIT_CH0) 每 1ms 自动调用一次
+ *       角度环 (AnglePID) → 角速度环 (AngularRatePID) → 速度环 (VelocityPID×4)
  */
 void pit_handler(void)
 {
     MotionPID_UpdateSensorData();
 
     float angle_correction = 0.0f;
+
+    if (g_heading_hold_enabled && g_angle_pid_controller.enabled)
+    {
+        g_heading_target_rate = AnglePID_Calculate(
+            &g_angle_pid_controller,
+            g_heading_target,
+            g_sensor_data.yaw,
+            SENSOR_UPDATE_PERIOD_MS / 1000.0f
+        );
+    }
 
     if (g_heading_hold_enabled && g_angular_rate_pid.enabled)
     {
@@ -240,6 +273,8 @@ void pit_handler(void)
             SENSOR_UPDATE_PERIOD_MS / 1000.0f
         );
     }
+
+    g_heading_correction_result = angle_correction;
 
     for (uint8 i = 0; i < ENCODER_COUNT; i++)
     {
@@ -393,7 +428,7 @@ void MotionPID_EnableHeadingHold(void)
 
     if (!g_heading_hold_enabled)
     {
-        float current_angle = imu963_get_angle();
+        float current_angle = imu963_data.angle_deg;
 
         g_heading_target = current_angle;
         g_heading_target_rate = 0.0f;
@@ -413,21 +448,25 @@ void MotionPID_DisableHeadingHold(void)
     g_angle_pid_controller.enabled = 0;
     AngularRatePID_Reset(&g_angular_rate_pid);
     g_angular_rate_pid.enabled = 0;
+    g_heading_correction_result = 0.0f;
 }
 
-void MotionPID_UpdateHeadingControl(float dt)
+void MotionPID_ApplyHeadingCorrection(void)
 {
     if (!g_heading_hold_enabled)
         return;
-    if (!imu963_data.initialized)
+    if (g_heading_correction_result == 0.0f)
         return;
 
-    float current_angle = imu963_get_angle();
-
-    g_heading_target_rate = AnglePID_Calculate(
-        &g_angle_pid_controller,
-        g_heading_target,
-        current_angle,
-        dt
-    );
+    for (uint8 i = 0; i < ENCODER_COUNT; i++)
+    {
+        if (i == MOTOR_RIGHT_FRONT || i == MOTOR_RIGHT_REAR)
+        {
+            g_motor_controller.target_speed[i] -= g_heading_correction_result;
+        }
+        else
+        {
+            g_motor_controller.target_speed[i] += g_heading_correction_result;
+        }
+    }
 }
