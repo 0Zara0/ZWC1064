@@ -11,10 +11,12 @@
 //    DEBUG_STAGE=7: 路径执行端到端 (硬编码测试路径)
 //    DEBUG_STAGE=8: OpenMV串口通讯调试 (触发-接收-验证-解析)
 //    DEBUG_STAGE=9: 路径规划独立调试 (硬编码地图->求解->打印，电机不转)
+//    DEBUG_STAGE=10: 原地转向测试 (左转90°/右转90°/后转180°, 验证IMU+编码器)
 //  MAIN_DEBUG=0   → 完整工作模式 (推箱子求解 + 路径执行)
 // ============================================================================
 #define MAIN_DEBUG           1
-#define DEBUG_STAGE          6
+#define DEBUG_STAGE          10
+
 
 // 电机旁路模式（用于纯算法调试，不驱动实际电机）
 // DEBUG_MOTOR_BYPASS=1: 所有电机控制指令只打印日志，不输出PWM
@@ -55,14 +57,14 @@
 #include "pid_algorithm.h"
 #include "move_mode.h"
 #include "dc_motor.h"
-
+#include "soko_map_tools.h"
+#include "sokoban_solver.h"
+#include "../../code/UART_with_OMV/omv_uart.h"
 // ============================================================================
 //  推箱子专用模块（条件编译）
 // ============================================================================
 #if !MAIN_DEBUG || (MAIN_DEBUG && DEBUG_STAGE >= 8)
-#include "soko_map_tools.h"
-#include "sokoban_solver.h"
-#include "omv_uart.h"
+
 #endif
 
 // ============================================================================
@@ -157,11 +159,14 @@ static void mark_all_objects(int map[SOKOMAP_ROW][SOKOMAP_COL])
 // ============================================================================
 int main(void)
 {
-	uint8_t dat[10]={0};
+	uint8_t map_dat[140]={0};
+	int map_num[140]={0};
+	int map[10][14];
+	char path[100]={0};
     clock_init(SYSTEM_CLOCK_600M);
     debug_init();
-		//imu963_init_with_calibration(300u,100u);
 		imu963_init();
+	OMV_UART_MAP_Init();
 //	uart_init(UART_4,115200, UART4_TX_C16, UART4_RX_C17);
     system_delay_ms(50);
 #if MAIN_DEBUG
@@ -189,9 +194,10 @@ int main(void)
 #if MAIN_DEBUG && DEBUG_STAGE >= 4
     printf("[3] Initializing PIT timer (PID loop)...\r\n");
     MotionPID_Timer_Init();
+    MotionPID_IMU_Timer_Init();
     printf("[4] Enabling interrupts...\r\n");
     interrupt_global_enable(0);
-    printf("    PID loop active (2ms)\r\n");
+    printf("    PID loop active (1ms) [CH0 motor, CH1 IMU]\r\n");
     system_delay_ms(300);
 #endif
 
@@ -210,7 +216,7 @@ int main(void)
         printf("   === Stage 1: Sensor Check (Encoder + IMU) ===\r\n");
         printf("========================================\r\n");
         printf("   [Motor]  All stopped (no PWM output)\r\n");
-        printf("   [Encoder] Turn each wheel manually, observe raw count + dir\r\n");
+        printf("   [Encoder] Turn each wheel manually, observe count + dir\r\n");
         printf("   [IMU]     Rotate chassis, observe Yaw angle + GyroZ\r\n");
         printf("========================================\r\n\r\n");
         printf("   T(s)     ENC_RF      ENC_LF      ENC_RR      ENC_LR      IMU_Yaw     IMU_GyroZ\r\n");
@@ -222,10 +228,10 @@ int main(void)
             tick++;
             if (tick % 4 == 0)
             {
-                int32 e0 = encoder_get_count(QTIMER2_ENCODER1);
-                int32 e1 = encoder_get_count(QTIMER1_ENCODER2);
-                int32 e2 = encoder_get_count(QTIMER2_ENCODER2);
-                int32 e3 = encoder_get_count(QTIMER1_ENCODER1);
+                int32 e0 = -encoder_get_count(QTIMER2_ENCODER1);
+                int32 e1 =  encoder_get_count(QTIMER1_ENCODER2);
+                int32 e2 = -encoder_get_count(QTIMER2_ENCODER2);
+                int32 e3 =  encoder_get_count(QTIMER1_ENCODER1);
                 float yaw   = imu963_get_angle();
                 float gyroZ = imu963_data.gyro_z;
 
@@ -251,6 +257,7 @@ int main(void)
             QTIMER2_ENCODER1, QTIMER1_ENCODER2,
             QTIMER2_ENCODER2, QTIMER1_ENCODER1
         };
+        const int32 enc_sign[4] = { -1, 1, -1, 1 };  // ENC0/2 reversed vs motor forward
         const char *mot_name[4] = { "RF", "LF", "RR", "LR" };
 
         printf("\r\n========================================\r\n");
@@ -258,44 +265,44 @@ int main(void)
         printf("========================================\r\n");
         printf("   Each motor: +20%% PWM 2s -> stop 1s -> -20%% 2s -> stop 1s\r\n");
         printf("   Expect: +PWM forward, encoder count increases\r\n");
-        printf("   Display: raw ENC only (no sign correction)\r\n");
+        printf("   Display: raw ENC + signed ENC (ENC0/2 reversed)\r\n");
         printf("========================================\r\n");
 
         for (int m = 0; m < 4; m++)
         {
             printf("\r\n-------- Motor %d (%s) +20%% PWM --------\r\n", m, mot_name[m]);
-            printf("  Time    ENC_raw\r\n");
-            printf("  ----    -------\r\n");
+            printf("  Time    ENC_raw  ENC_signed\r\n");
+            printf("  ----    -------  ----------\r\n");
             encoder_clear_count(enc_ch[m]);
             DCMotor_SetSpeed(&g_motor_controller.motor[m], 20.0f);
             for (int t = 0; t < 10; t++)
             {
                 system_delay_ms(200);
                 int32 raw = encoder_get_count(enc_ch[m]);
-                printf("  %4.1fs   %5d\r\n",
-                       (t + 1) * 0.2f, raw);
+                printf("  %4.1fs   %5d     %5d\r\n",
+                       (t + 1) * 0.2f, raw, raw * enc_sign[m]);
             }
             DCMotor_SetSpeed(&g_motor_controller.motor[m], 0.0f);
             system_delay_ms(1000);
 
             printf("\r\n-------- Motor %d (%s) -20%% PWM --------\r\n", m, mot_name[m]);
-            printf("  Time    ENC_raw\r\n");
-            printf("  ----    -------\r\n");
+            printf("  Time    ENC_raw  ENC_signed\r\n");
+            printf("  ----    -------  ----------\r\n");
             encoder_clear_count(enc_ch[m]);
             DCMotor_SetSpeed(&g_motor_controller.motor[m], -20.0f);
             for (int t = 0; t < 10; t++)
             {
                 system_delay_ms(200);
                 int32 raw = encoder_get_count(enc_ch[m]);
-                printf("  %4.1fs   %5d\r\n",
-                       (t + 1) * 0.2f, raw);
+                printf("  %4.1fs   %5d     %5d\r\n",
+                       (t + 1) * 0.2f, raw, raw * enc_sign[m]);
             }
             DCMotor_SetSpeed(&g_motor_controller.motor[m], 0.0f);
             system_delay_ms(1000);
         }
 
         printf("\r\n=== Stage 2 Complete ===\r\n");
-        printf("Verify: +PWM -> note ENC direction for each motor\r\n");
+        printf("Verify: +PWM -> ENC_signed positive for all 4 motors\r\n");
         while (1) { system_delay_ms(1000); }
     }
 
@@ -306,6 +313,7 @@ int main(void)
             QTIMER2_ENCODER1, QTIMER1_ENCODER2,
             QTIMER2_ENCODER2, QTIMER1_ENCODER1
         };
+        const int32 enc_sign[4] = { -1, 1, -1, 1 };
         const char *mode_name[] = { "Forward", "Backward", "Strafe Left", "Strafe Right" };
 
         printf("\r\n========================================\r\n");
@@ -345,9 +353,12 @@ int main(void)
                 int32 e2 = encoder_get_count(enc_ch[2]);
                 int32 e3 = encoder_get_count(enc_ch[3]);
 
-                printf("  %.1fs  ENC0:%5d  ENC1:%5d  ENC2:%5d  ENC3:%5d  GyroZ:%+5.1f\r\n",
+                printf("  %.1fs  ENC0:%5d(%+d)  ENC1:%5d(%+d)  ENC2:%5d(%+d)  ENC3:%5d(%+d)  GyroZ:%+5.1f\r\n",
                        (t + 1) * 0.2f,
-                       e0, e1, e2, e3,
+                       e0, e0 * enc_sign[0],
+                       e1, e1 * enc_sign[1],
+                       e2, e2 * enc_sign[2],
+                       e3, e3 * enc_sign[3],
                        imu963_data.gyro_z);
             }
 
@@ -374,7 +385,7 @@ int main(void)
         printf("   === Stage 4: Single Motor PID Step Response ===\r\n");
         printf("========================================\r\n");
         printf("   Each motor: target 5000 pps for 3s, then stop 1s\r\n");
-        printf("   PIT interrupt drives PID at 2ms; main loop prints @ 100ms\r\n");
+        printf("   PIT interrupt drives PID at 1ms; main loop prints @ 100ms\r\n");
         printf("   ERROR counts: forward-motor +ERROR means too slow, more PWM\r\n");
         printf("========================================\r\n");
 
@@ -393,7 +404,7 @@ int main(void)
             for (int t = 0; t < 30; t++)
             {
                 system_delay_ms(100);
-                float actual = MotionPID_GetActualSpeed(m);
+                float actual = EncoderSpeedCalc_GetFilteredSpeed(m);
 
                 printf("  %4.1fs   %5.0f     %5.0f    %+5.0f   %+6.1f   %+6.1f   %+4.0f\r\n",
                        t * 0.1f,
@@ -417,82 +428,85 @@ int main(void)
     // Stage 5: Combined Motion + Heading Hold ================================
 #elif DEBUG_STAGE == 5
     {
+        const float test_speed = (float)MOVE_DEFAULT_SPEED;
+
         printf("\r\n========================================\r\n");
         printf("   === Stage 5: Combined Motion + Heading Hold ===\r\n");
         printf("========================================\r\n");
-        printf("   Test1: Forward 300pps for 5s (heading hold ON)\r\n");
-        printf("   Test2: Strafe Left 300pps for 5s (heading hold OFF)\r\n");
-        printf("   Test3: Strafe Right 300pps for 5s (heading hold OFF)\r\n");
+        printf("   Test1: Forward %.0fpps for 5s (heading hold ON)\r\n", test_speed);
+        printf("   Test2: Strafe Left %.0fpps for 5s (heading hold ON)\r\n", test_speed);
+        printf("   Test3: Strafe Right %.0fpps for 5s (heading hold ON)\r\n", test_speed);
+        printf("   NOTE: All IMU reads use ISR cache (no SPI in main loop)\r\n");
         printf("========================================\r\n");
 
         // Test 1: Forward with heading hold
-        printf("\r\n--- Forward 300pps, heading hold ON ---\r\n");
-        printf("  Time    Yaw_Tgt  Yaw_Cur  Error    AngCorr   Speed0    Speed1    Speed2    Speed3\r\n");
+        printf("\r\n--- Forward %.0fpps, heading hold ON ---\r\n", test_speed);
+        printf("  Time    Yaw_Tgt  Yaw_Cur  Error    AngCorr   Spd_RF    Spd_LF    Spd_RR    Spd_LR\r\n");
         printf("  ----    -------  -------  -----    -------   ------    ------    ------    ------\r\n");
 
-        MoveMode_SetSpeed(FORWARD, 300.0f);
+        MoveMode_SetSpeed(FORWARD, test_speed);
 
         for (int t = 0; t < 50; t++)
         {
             system_delay_ms(100);
-            float yaw_cur = imu963_get_angle();
+            float yaw_cur = imu963_data.angle_deg;
             float yaw_err = g_heading_target - yaw_cur;
             if (yaw_err > 180.0f) yaw_err -= 360.0f;
             if (yaw_err < -180.0f) yaw_err += 360.0f;
 
-            printf("  %4.1fs  %6.1f   %6.1f  %+5.1f   %+6.1f   %5.0f      %5.0f      %5.0f      %5.0f\r\n",
+            printf("  %4.1fs  %6.1f   %6.1f  %+5.1f   %+6.1f   %+6.0f    %+6.0f    %+6.0f    %+6.0f\r\n",
                    t * 0.1f,
                    g_heading_target, yaw_cur, yaw_err,
                    g_angle_pid_controller.output,
-                   EncoderSpeedCalc_GetFilteredSpeed(0),
-                   EncoderSpeedCalc_GetFilteredSpeed(1),
-                   EncoderSpeedCalc_GetFilteredSpeed(2),
-                   EncoderSpeedCalc_GetFilteredSpeed(3));
+                   MotionPID_GetActualSpeed(0),
+                   MotionPID_GetActualSpeed(1),
+                   MotionPID_GetActualSpeed(2),
+                   MotionPID_GetActualSpeed(3));
         }
 
         MoveMode_SetSpeed(STOP, 0.0f);
         system_delay_ms(1500);
 
-        // Test 2: Strafe Left (no heading hold)
-        printf("\r\n--- Strafe Left 300pps ---\r\n");
-        printf("  Time    Speed_RF  Speed_LF  Speed_RR  Speed_LR  Yaw  GyroZ\r\n");
-        printf("  ----    --------  --------  --------  --------  ---- -----\r\n");
+        // Test 2: Strafe Left
+        printf("\r\n--- Strafe Left %.0fpps ---\r\n", test_speed);
+        printf("  Time    Spd_RF    Spd_LF    Spd_RR    Spd_LR    Yaw    GyroZ\r\n");
+        printf("  ----    ------    ------    ------    ------    -----  -----\r\n");
 
-        MoveMode_SetSpeed(STRAFE_LEFT, 300.0f);
+        MoveMode_SetSpeed(STRAFE_LEFT, test_speed);
 
         for (int t = 0; t < 50; t++)
         {
             system_delay_ms(100);
-            printf("  %4.1fs  %+6.0f    %+6.0f    %+6.0f    %+6.0f    %5.1f %+5.1f\r\n",
+            printf("  %4.1fs  %+6.0f    %+6.0f    %+6.0f    %+6.0f    %5.1f %+6.1f\r\n",
                    t * 0.1f,
-                   EncoderSpeedCalc_GetFilteredSpeed(0),
-                   EncoderSpeedCalc_GetFilteredSpeed(1),
-                   EncoderSpeedCalc_GetFilteredSpeed(2),
-                   EncoderSpeedCalc_GetFilteredSpeed(3),
-                   imu963_get_angle(),
+                   MotionPID_GetActualSpeed(0),
+                   MotionPID_GetActualSpeed(1),
+                   MotionPID_GetActualSpeed(2),
+                   MotionPID_GetActualSpeed(3),
+                   imu963_data.angle_deg,
                    imu963_data.gyro_z);
         }
 
         MoveMode_SetSpeed(STOP, 0.0f);
         system_delay_ms(1500);
 
-        // Test 3: Strafe Right (no heading hold)
-        printf("\r\n--- Strafe Right 300pps ---\r\n");
-        printf("  Time    Speed_RF  Speed_LF  Speed_RR  Speed_LR  Yaw  GyroZ\r\n");
-        printf("  ----    --------  --------  --------  --------  ---- -----\r\n");
+        // Test 3: Strafe Right
+        printf("\r\n--- Strafe Right %.0fpps ---\r\n", test_speed);
+        printf("  Time    Spd_RF    Spd_LF    Spd_RR    Spd_LR    Yaw    GyroZ\r\n");
+        printf("  ----    ------    ------    ------    ------    -----  -----\r\n");
 
-        MoveMode_SetSpeed(STRAFE_RIGHT, 300.0f);
+        MoveMode_SetSpeed(STRAFE_RIGHT, test_speed);
 
         for (int t = 0; t < 50; t++)
         {
             system_delay_ms(100);
-            printf("  %4.1fs  %+6.0f    %+6.0f    %+6.0f    %+6.0f    %5.1f %+5.1f\r\n",
+            printf("  %4.1fs  %+6.0f    %+6.0f    %+6.0f    %+6.0f    %5.1f %+6.1f\r\n",
                    t * 0.1f,
-                   EncoderSpeedCalc_GetFilteredSpeed(0),
-                   EncoderSpeedCalc_GetFilteredSpeed(1),
-                   EncoderSpeedCalc_GetFilteredSpeed(2),
-                   EncoderSpeedCalc_GetFilteredSpeed(3),
-                   imu963_get_angle(),
+                   MotionPID_GetActualSpeed(0),
+                   MotionPID_GetActualSpeed(1),
+                   MotionPID_GetActualSpeed(2),
+                   MotionPID_GetActualSpeed(3),
+                   imu963_data.angle_deg,
                    imu963_data.gyro_z);
         }
 
@@ -639,7 +653,8 @@ int main(void)
        // system_delay_ms(1000);
 
         printf("\r\nExecuting path: WWDDSSAA (square loop)...\r\n");
-        MoveMode_RunPath("AAAAASSSAWWWWAASAWSAAAWWWW", MOVE_RUNPATH_DEFAULT_SPEED);
+//        MoveMode_RunPath("AAAAASSSAWWWWAASAWSAAAWWWW", MOVE_RUNPATH_DEFAULT_SPEED);
+			MoveMode_RunPath("WWWWWWWWWWAAAADDSSSSSSSSS", MOVE_RUNPATH_DEFAULT_SPEED);
         printf("Path done!\r\n");
 
         printf("\r\n=== Stage 7 Complete ===\r\n");
@@ -996,6 +1011,105 @@ int main(void)
         while (1) { system_delay_ms(1000); }
     }
 
+    // Stage 10: Turn Test ====================================================
+#elif DEBUG_STAGE == 10
+    {
+        printf("\r\n========================================\r\n");
+        printf("   === Stage 10: In-Place Turn Test ===\r\n");
+        printf("========================================\r\n");
+        printf("   Test1: TurnLeft  1/4 (90deg CCW) @ %d pps\r\n", MOVE_DEFAULT_SPEED);
+        printf("   Test2: TurnRight 1/4 (90deg CW)  @ %d pps\r\n", MOVE_DEFAULT_SPEED);
+        printf("   Test3: TurnBack  2/4 (180deg)    @ %d pps\r\n", MOVE_DEFAULT_SPEED);
+        printf("   Verify: IMU Yaw changes ~90deg per 1/4 turn\r\n");
+        printf("   Verify: RF/LF opposite sign, RR/LR opposite sign\r\n");
+        printf("========================================\r\n\r\n");
+
+        // Test 1: Left Turn 90deg
+        printf("[1/3] Turn Left 90deg (CCW)...\r\n");
+        printf("Expected: RF+   LF-   RR+   LR-\r\n");
+        printf("  Time     ENC_RF    ENC_LF    ENC_RR    ENC_LR   Yaw    GyroZ   Remain\r\n");
+        printf("  ----     ------    ------    ------    ------   -----  ------  ------\r\n");
+
+        MoveMode_TurnLeftDistance(1, MOVE_DEFAULT_SPEED);
+        {
+            uint32 t = 0;
+            while (!MoveMode_IsFinished())
+            {
+                system_delay_ms(100);
+                MoveMode_DistanceUpdate();
+                t++;
+                printf("  %4.1fs   %+6.0f    %+6.0f    %+6.0f    %+6.0f   %5.1f  %+6.1f\r\n",
+                       t * 0.1f,
+                       EncoderSpeedCalc_GetFilteredSpeed(0),
+                       EncoderSpeedCalc_GetFilteredSpeed(1),
+                       EncoderSpeedCalc_GetFilteredSpeed(2),
+                       EncoderSpeedCalc_GetFilteredSpeed(3),
+                       imu963_data.angle_deg,
+                       imu963_data.gyro_z);
+            }
+        }
+        printf("  --- Turn Left done ---\r\n\r\n");
+        system_delay_ms(1000);
+
+        // Test 2: Right Turn 90deg
+        printf("[2/3] Turn Right 90deg (CW)...\r\n");
+        printf("Expected: RF-   LF+   RR-   LR+\r\n");
+        printf("  Time     ENC_RF    ENC_LF    ENC_RR    ENC_LR   Yaw    GyroZ   Remain\r\n");
+        printf("  ----     ------    ------    ------    ------   -----  ------  ------\r\n");
+
+        MoveMode_TurnRightDistance(1, MOVE_DEFAULT_SPEED);
+        {
+            uint32 t = 0;
+            while (!MoveMode_IsFinished())
+            {
+                system_delay_ms(100);
+                MoveMode_DistanceUpdate();
+                t++;
+                printf("  %4.1fs   %+6.0f    %+6.0f    %+6.0f    %+6.0f   %5.1f  %+6.1f\r\n",
+                       t * 0.1f,
+                       EncoderSpeedCalc_GetFilteredSpeed(0),
+                       EncoderSpeedCalc_GetFilteredSpeed(1),
+                       EncoderSpeedCalc_GetFilteredSpeed(2),
+                       EncoderSpeedCalc_GetFilteredSpeed(3),
+                       imu963_data.angle_deg,
+                       imu963_data.gyro_z);
+            }
+        }
+        printf("  --- Turn Right done ---\r\n\r\n");
+        system_delay_ms(1000);
+
+        // Test 3: Turn Back 180deg
+        printf("[3/3] Turn Back 180deg...\r\n");
+        printf("  Time     ENC_RF    ENC_LF    ENC_RR    ENC_LR   Yaw    GyroZ   Remain\r\n");
+        printf("  ----     ------    ------    ------    ------   -----  ------  ------\r\n");
+
+        MoveMode_TurnBack(MOVE_DEFAULT_SPEED);
+        {
+            uint32 t = 0;
+            while (!MoveMode_IsFinished())
+            {
+                system_delay_ms(100);
+                MoveMode_DistanceUpdate();
+                t++;
+                printf("  %4.1fs   %+6.0f    %+6.0f    %+6.0f    %+6.0f   %5.1f  %+6.1f\r\n",
+                       t * 0.1f,
+                       EncoderSpeedCalc_GetFilteredSpeed(0),
+                       EncoderSpeedCalc_GetFilteredSpeed(1),
+                       EncoderSpeedCalc_GetFilteredSpeed(2),
+                       EncoderSpeedCalc_GetFilteredSpeed(3),
+                       imu963_data.angle_deg,
+                       imu963_data.gyro_z);
+            }
+        }
+        printf("  --- Turn Back done ---\r\n\r\n");
+
+        printf("========================================\r\n");
+        printf("=== Stage 10 Complete ===\r\n");
+        printf("[VERIFY] IMU Yaw changes: ~90deg for L/R, ~180deg for Back\r\n");
+        printf("[VERIFY] Encoder signs match expected per test\r\n");
+        while (1) { system_delay_ms(1000); }
+    }
+
 #endif
 
     // ========================================================================
@@ -1003,81 +1117,92 @@ int main(void)
     // ========================================================================
 #else
 
-    printf("[2/4] Initializing motors...\r\n");
+//    printf("[2/4] Initializing motors...\r\n");
     MotionPID_Motor_Init();
     MoveMode_Init();
-    printf("      4 motors initialized\r\n");
+//    printf("      4 motors initialized\r\n");
 
-    printf("[3/4] Initializing OMV UART...\r\n");
-    OMV_UART_Init();
-    printf("      OMV UART initialized (UART4, 115200bps, 14x10 map)\r\n");
+//    printf("[3/4] Initializing OMV UART...\r\n");
+//    OMV_UART_Init();
+//    printf("      OMV UART initialized (UART4, 115200bps, 14x10 map)\r\n");
 
-    printf("[4/4] Enabling interrupts...\r\n");
+//    printf("[4/4] Enabling interrupts...\r\n");
     interrupt_global_enable(0);
-    printf("      Interrupts enabled\r\n");
+//    printf("      Interrupts enabled\r\n");
 
-    printf("   System ready\r\n");
-    printf("   ===== Waiting for map data =====\r\n");
+//    printf("   System ready\r\n");
+//    printf("   ===== Waiting for map data =====\r\n");
 
     while (1)
     {
-        uint16 recv_len;
-        SokoMapStatus map_status;
-        SokobanStatus solve_status;
+//			uint8_t runresult=0;
+//        uint16 recv_len;
+			
+//        SokoMapStatus map_status;
+//        SokobanStatus solve_status;
 
-        printf("\r\n--- Requesting map from OpenMV ---\r\n");
+//        printf("\r\n--- Requesting map from OpenMV ---\r\n");
 
-        recv_len = OMV_TriggerAndReceive(s_omv_buffer, OMV_MAP_TOTAL);
+//        recv_len = OMV_TriggerAndReceive(s_omv_buffer, OMV_MAP_TOTAL);
+//			OMV_UART_MAP_SEND(0x01);
+//			while(!OMV_UART_MAP_RECEIVE(map_dat)){}
+//				ReloadNummap_signed(map_num,map);
+//				SokoMap_AsciiToIntArray(map_dat,map_num);
+//				SokoMap_IntArrayToMap(map_num,map);
+//				SokoMap_MarkNearest(map,'Z');
+//				Sokoban_Solve(map, path, sizeof(path));
+//				MoveMode_RunPath("SSSAAAAAAAAAAAAWWWWWWDDDDDDSSASSDDSDWWWWDDSSSASAWWDDDD", MOVE_RUNPATH_DEFAULT_SPEED);
+//			system_delay_ms(50000);
+//				MoveMode_RunPath(path, MOVE_RUNPATH_DEFAULT_SPEED);
+//        if (recv_len != OMV_MAP_TOTAL) {
+//            printf("WARNING: Received %u/%u bytes, retrying...\r\n",
+//                   recv_len, OMV_MAP_TOTAL);
+//            system_delay_ms(500);
+//            continue;
+//        }
 
-        if (recv_len != OMV_MAP_TOTAL) {
-            printf("WARNING: Received %u/%u bytes, retrying...\r\n",
-                   recv_len, OMV_MAP_TOTAL);
-            system_delay_ms(500);
-            continue;
-        }
+//        printf("Map received: %u bytes\r\n", recv_len);
 
-        printf("Map received: %u bytes\r\n", recv_len);
+//        if (!OMV_MapIsValid(s_omv_buffer, OMV_MAP_TOTAL)) {
+//            printf("WARNING: Invalid map data, retrying...\r\n");
+//            system_delay_ms(500);
+//            continue;
+//        }
 
-        if (!OMV_MapIsValid(s_omv_buffer, OMV_MAP_TOTAL)) {
-            printf("WARNING: Invalid map data, retrying...\r\n");
-            system_delay_ms(500);
-            continue;
-        }
+//        OMV_MapToAscii(s_omv_buffer, s_ascii_map, OMV_MAP_TOTAL);
 
-        OMV_MapToAscii(s_omv_buffer, s_ascii_map, OMV_MAP_TOTAL);
+//        map_status = SokoMap_AsciiToIntArray(s_ascii_map, s_num_map);
+//        if (map_status != SOKOMAP_OK) {
+//            printf("WARNING: ASCII to int conversion: %s\r\n",
+//                   SokoMap_StatusString(map_status));
+//        }
 
-        map_status = SokoMap_AsciiToIntArray(s_ascii_map, s_num_map);
-        if (map_status != SOKOMAP_OK) {
-            printf("WARNING: ASCII to int conversion: %s\r\n",
-                   SokoMap_StatusString(map_status));
-        }
+//        map_status = SokoMap_IntArrayToMap(s_num_map, s_game_map);
+//        if (map_status != SOKOMAP_OK) {
+//            printf("ERROR: IntArray to 2D map failed: %s\r\n",
+//                   SokoMap_StatusString(map_status));
+//            continue;
+//        }
 
-        map_status = SokoMap_IntArrayToMap(s_num_map, s_game_map);
-        if (map_status != SOKOMAP_OK) {
-            printf("ERROR: IntArray to 2D map failed: %s\r\n",
-                   SokoMap_StatusString(map_status));
-            continue;
-        }
+//        printf("Marking boxes and targets...\r\n");
+//        mark_all_objects(s_game_map);
 
-        printf("Marking boxes and targets...\r\n");
-        mark_all_objects(s_game_map);
+//        printf("Solving path...\r\n");
+//        solve_status = Sokoban_Solve(s_game_map, s_path, SOKOBAN_MAX_STEP);
 
-        printf("Solving path...\r\n");
-        solve_status = Sokoban_Solve(s_game_map, s_path, SOKOBAN_MAX_STEP);
+//        if (solve_status != SOKOBAN_OK) {
+//            printf("Solver failed: %s\r\n", Sokoban_StatusString(solve_status));
+//            system_delay_ms(500);
+//            continue;
+//        }
 
-        if (solve_status != SOKOBAN_OK) {
-            printf("Solver failed: %s\r\n", Sokoban_StatusString(solve_status));
-            system_delay_ms(500);
-            continue;
-        }
+//        printf("Path found: %s\r\n", s_path);
+//        printf("Executing path (%u steps)...\r\n", (uint16)strlen(s_path));
 
-        printf("Path found: %s\r\n", s_path);
-        printf("Executing path (%u steps)...\r\n", (uint16)strlen(s_path));
+//        MoveMode_RunPath(s_path, MOVE_RUNPATH_DEFAULT_SPEED);
 
-        MoveMode_RunPath(s_path, MOVE_RUNPATH_DEFAULT_SPEED);
-
-        printf("Path execution completed!\r\n");
-        system_delay_ms(1000);
+//        printf("Path execution completed!\r\n");
+//        system_delay_ms(1000);
     }
 
 #endif

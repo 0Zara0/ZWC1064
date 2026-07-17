@@ -34,7 +34,8 @@
 
 // 定时器配置
 #define SENSOR_TIMER_CH         PIT_CH0
-#define SENSOR_UPDATE_PERIOD_MS 2
+#define SENSOR_UPDATE_PERIOD_MS 1
+#define IMU_TIMER_CH            PIT_CH1
 
 /**
  * @brief 传感器数据结构体定义
@@ -44,10 +45,9 @@ typedef struct
     // 编码器原始数据 / 速度数据
     int16 encoder_speed[ENCODER_COUNT];
 
-    // IMU963RA 九轴传感器原始数据
+    // IMU963RA 六轴传感器原始数据（磁力计已禁用）
     float acc_x, acc_y, acc_z;
     float gyro_x, gyro_y, gyro_z;
-    float mag_x, mag_y, mag_z;
 
     // 融合后的偏航角
     float yaw;
@@ -80,6 +80,7 @@ void MotionPID_IMU_Init(void);
 void MotionPID_Sensor_Init(void);
 void MotionPID_Motor_Init(void);
 void MotionPID_Timer_Init(void);
+void MotionPID_IMU_Timer_Init(void);
 void MotionPID_ResetTimer(void);
 
 // ==================================================== 传感器数据更新 ====================================================
@@ -91,6 +92,7 @@ void MotionPID_UpdateSensorData(void);
 // ==================================================== PIT 中断回调 ====================================================
 
 void pit_handler(void);
+void imu_timer_handler(void);
 
 // ==================================================== 电机目标速度控制 ====================================================
 
@@ -121,6 +123,6 @@ float MotionPID_GetActualSpeed(uint8 motor_index);
 void MotionPID_InitHeadingHold(void);
 void MotionPID_EnableHeadingHold(void);
 void MotionPID_DisableHeadingHold(void);
-void MotionPID_UpdateHeadingControl(float dt);
+void MotionPID_ApplyHeadingCorrection(void);
 
 #endif

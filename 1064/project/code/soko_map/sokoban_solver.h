@@ -56,7 +56,9 @@ typedef enum {
  *   0 road, 1 wall, 2 player, 3 unknown box, 4 unknown target,
  *   5 bomb, 'A'..'Z' boxes, 'a'..'z' matching targets.
  *
- * out_path receives W/S/A/D plus observation codes 1/2/3/4.
+ * out_path receives W/S/A/D/Q/E plus observation codes 1/2/3/4.
+ *   W: forward, S: backward, A: strafe left, D: strafe right
+ *   Q: turn left (90deg CCW), E: turn right (90deg CW)
  * Use an output buffer of at least SOKOBAN_MAX_STEP bytes.
  *
  * If a bomb explodes, game_map is modified in-place by clearing walls

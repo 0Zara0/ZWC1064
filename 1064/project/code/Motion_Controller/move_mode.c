@@ -114,6 +114,7 @@ void MoveMode_Init(void)
 
     // 初始化定时器（启动自动 PID 控制循环）
     MotionPID_Timer_Init();
+    MotionPID_IMU_Timer_Init();
 
     // 短暂延时确保系统稳定
     system_delay_ms(50);
@@ -153,6 +154,24 @@ void MoveMode_SetSpeed(MoveMode_t mode, float speed)
         case STRAFE_RIGHT:
             MotionPID_EnableHeadingHold();
             MotionPID_SetMecanumSpeed(0.0f, -speed);
+            break;
+
+        case TURN_LEFT:
+            // 原地左转：左侧两轮向后，右侧两轮向前，禁用航向保持
+            MotionPID_DisableHeadingHold();
+            MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT,  speed);
+            MotionPID_SetTargetSpeed(MOTOR_LEFT_FRONT,  -speed);
+            MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR,   speed);
+            MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR,   -speed);
+            break;
+
+        case TURN_RIGHT:
+            // 原地右转：右侧两轮向后，左侧两轮向前，禁用航向保持
+            MotionPID_DisableHeadingHold();
+            MotionPID_SetTargetSpeed(MOTOR_RIGHT_FRONT, -speed);
+            MotionPID_SetTargetSpeed(MOTOR_LEFT_FRONT,   speed);
+            MotionPID_SetTargetSpeed(MOTOR_RIGHT_REAR,  -speed);
+            MotionPID_SetTargetSpeed(MOTOR_LEFT_REAR,    speed);
             break;
 
         case STOP:
@@ -246,6 +265,11 @@ static void MoveMode_StartDistance(MoveMode_t mode, int32 distance, float speed)
             pulse_per_unit = MOVE_DISTANCE_STRAFE_PULSE;
             break;
 
+        case TURN_LEFT:
+        case TURN_RIGHT:
+            pulse_per_unit = MOVE_DISTANCE_TURN_QUARTER_PULSE;
+            break;
+
         default:
             return; // 无效模式
     }
@@ -270,6 +294,8 @@ static void MoveMode_StartDistance(MoveMode_t mode, int32 distance, float speed)
             case BACKWARD:     g_current_mode = FORWARD;      break;
             case STRAFE_LEFT:  g_current_mode = STRAFE_RIGHT; break;
             case STRAFE_RIGHT: g_current_mode = STRAFE_LEFT;  break;
+            case TURN_LEFT:    g_current_mode = TURN_RIGHT;   break;
+            case TURN_RIGHT:   g_current_mode = TURN_LEFT;    break;
             default:           g_current_mode = STOP;         break;
         }
 
@@ -326,6 +352,35 @@ void MoveMode_StrafeRightDistance(int32 distance, float speed)
 }
 
 /**
+ * @brief 原地左转指定角度（CCW，逆时针）
+ * @param quarter_turns 转向角度（单位：1/4 周，正数 CCW）
+ * @param speed 转向速度，单位：脉冲/秒
+ */
+void MoveMode_TurnLeftDistance(int32 quarter_turns, float speed)
+{
+    MoveMode_StartDistance(TURN_LEFT, quarter_turns, speed);
+}
+
+/**
+ * @brief 原地右转指定角度（CW，顺时针）
+ * @param quarter_turns 转向角度（单位：1/4 周，正数 CW）
+ * @param speed 转向速度，单位：脉冲/秒
+ */
+void MoveMode_TurnRightDistance(int32 quarter_turns, float speed)
+{
+    MoveMode_StartDistance(TURN_RIGHT, quarter_turns, speed);
+}
+
+/**
+ * @brief 原地 180° 后转
+ * @param speed 转向速度，单位：脉冲/秒
+ */
+void MoveMode_TurnBack(float speed)
+{
+    MoveMode_StartDistance(TURN_LEFT, 2, speed);
+}
+
+/**
  * @brief 查询当前距离移动是否完成
  * @return uint8 1=移动完成，0=正在移动或未开始
  */
@@ -354,8 +409,6 @@ void MoveMode_DistanceUpdate(void)
     {
         return;
     }
-
-    MotionPID_UpdateHeadingControl(0.010f);
 
     // 读取当前编码器值
     int16 current_count[ENCODER_COUNT];
@@ -395,8 +448,10 @@ void MoveMode_DistanceUpdate(void)
     // 底盘位移分量估计
     // forward_pos > 0 表示整体向前
     // strafe_pos  > 0 表示整体向左
-    int32 forward_pos = (p0 + p1 + p2 + p3) / 4;
-    int32 strafe_pos  = (p0 - p1 - p2 + p3) / 4;
+    // rotation_pos > 0 表示逆时针旋转（CCW）
+    int32 forward_pos  = (p0 + p1 + p2 + p3) / 4;
+    int32 strafe_pos   = (p0 - p1 - p2 + p3) / 4;
+    int32 rotation_pos = (p0 - p1 + p2 - p3) / 4;
 
     // 根据移动模式选择距离判定分量
     int32 avg_delta = 0;
@@ -410,6 +465,14 @@ void MoveMode_DistanceUpdate(void)
         case STRAFE_LEFT:
         case STRAFE_RIGHT:
             avg_delta = MoveMode_AbsInt32(strafe_pos);
+            break;
+
+        case TURN_LEFT:
+            avg_delta = rotation_pos;
+            break;
+
+        case TURN_RIGHT:
+            avg_delta = -rotation_pos;
             break;
 
         default:
@@ -445,6 +508,7 @@ void MoveMode_DistanceUpdate(void)
         {
             MoveMode_SetSpeed(g_current_mode, dynamic_speed);
         }
+        MotionPID_ApplyHeadingCorrection();
     }
     else
     {
@@ -497,6 +561,8 @@ static uint8 runpath_step(char dir, int32 count, float speed)
         case 'S': MoveMode_BackwardDistance(count, speed);    break;
         case 'A': MoveMode_StrafeLeftDistance(count, speed);  break;
         case 'D': MoveMode_StrafeRightDistance(count, speed); break;
+        case 'Q': MoveMode_TurnLeftDistance(count, speed);    break;
+        case 'E': MoveMode_TurnRightDistance(count, speed);   break;
         default:  return 0;
     }
 
@@ -533,7 +599,7 @@ uint8 MoveMode_RunPath(const char *path, float speed)
             continue;
         }
 
-        if (ch == 'W' || ch == 'S' || ch == 'A' || ch == 'D')
+        if (ch == 'W' || ch == 'S' || ch == 'A' || ch == 'D' || ch == 'Q' || ch == 'E')
         {
             char dir = ch;
             int32 count = 1;
